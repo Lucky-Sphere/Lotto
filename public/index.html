@@ -1,24 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Malaysia Lottery Results</title>
+<title>Lucky Sphere Lotto</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  body { background: #f0f2f5; }
-  .sidebar { background: #1a1a2e; min-height: 100vh; }
-  .sidebar .nav-link { color: #adb5bd; border-left: 3px solid transparent; border-radius: 0; }
-  .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background: rgba(255,255,255,.08); }
-  .sidebar .nav-link.active { border-left-color: #4fc3f7; }
-  .draw-card { cursor: pointer; transition: box-shadow .15s; }
-  .draw-card:hover { box-shadow: 0 .25rem .75rem rgba(0,0,0,.1) !important; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  body { background: #0f0f1a; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #cfd8e3; }
+  .sidebar { background: #14142b; min-height: 100vh; }
+  .sidebar .nav-link { color: #8892a8; border-left: 3px solid transparent; border-radius: 0; font-size: .95rem; }
+  .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #e8edf5; background: rgba(255,255,255,.06); }
+  .sidebar .nav-link.active { border-left-color: #f5b342; }
+  .draw-card { cursor: pointer; transition: box-shadow .15s; background: #1a1a30; border: 1px solid #252545; color: #cfd8e3; }
+  .draw-card:hover { box-shadow: 0 .25rem .75rem rgba(0,0,0,.3) !important; border-color: #3a3a5c; }
   .draw-card .collapse-icon { transition: transform .2s; }
   .draw-card:not(.collapsed) .collapse-icon { transform: rotate(180deg); }
-  .tier-row:nth-child(odd) { background: #f8f9fa; }
-  .num-cell { font-family: 'Courier New', monospace; letter-spacing: 1px; }
-  .jp-badge { background: #fff8e1; }
+  .tier-row { border-radius: 6px; }
+  .tier-row:nth-child(odd) { background: rgba(255,255,255,.035); }
+  .num-cell { font-family: 'Inter', 'Courier New', monospace; letter-spacing: 1px; color: #f5b342; }
+  .jp-badge { background: rgba(245, 179, 66, .12); }
+  .game-box { background: #1e1e36; border: 1px solid #2a2a48; border-radius: 8px; }
+  .card-header-bg { background: rgba(255,255,255,.03); }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #14142b; }
+  ::-webkit-scrollbar-thumb { background: #3a3a5c; border-radius: 3px; }
   @media (max-width: 767.98px) {
     .sidebar { min-height: auto; }
   }
@@ -29,8 +36,8 @@
   <div class="row g-0">
     <aside class="col-md-3 col-lg-2 sidebar p-3" id="sidebar">
       <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-secondary">
-        <h1 class="h5 text-white mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i>Lottery</h1>
-        <button class="btn btn-sm btn-outline-light d-md-none" onclick="toggleSidebar()">
+        <h1 class="h5 text-white mb-0"><i class="bi bi-trophy-fill text-warning me-2"></i>Lucky Sphere Lotto</h1>
+        <button class="btn btn-sm btn-outline-light border-0 d-md-none" onclick="toggleSidebar()">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
@@ -41,7 +48,7 @@
         <button class="btn btn-outline-secondary btn-sm me-2" onclick="toggleSidebar()">
           <i class="bi bi-list"></i>
         </button>
-        <span class="fw-semibold" id="mobile-title">Malaysia Lottery</span>
+        <span class="fw-semibold text-light" id="mobile-title">Lucky Sphere Lotto</span>
       </div>
       <div id="content">
         <div class="text-center py-5 text-muted">
@@ -96,7 +103,6 @@ async function selectOperator(id) {
       <h2 class="h4 mb-0">${op.name}</h2>
       <a href="${op.website_url}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Visit website"><i class="bi bi-box-arrow-up-right"></i></a>
     </div>
-    <p class="text-muted small mb-3">${op.draw_count} draw(s) · ${op.result_count} result(s)</p>
     <div id="draws"></div>`;
   showLoading(document.getElementById('draws'));
   try {
@@ -129,12 +135,11 @@ function renderDraws(draws) {
               ${d.draw_label ? `<span class="badge bg-info bg-opacity-10 text-info-emphasis"><i class="bi bi-hash me-1"></i>${d.draw_label}</span>` : ''}
             </div>
             <div class="d-flex align-items-center gap-2 text-muted small">
-              <span>${games.length} game(s)</span>
               <i class="bi bi-chevron-down collapse-icon"></i>
             </div>
           </div>
           ${top3 ? `<div class="mt-2 small text-muted">${top3}</div>` : ''}
-          <div class="collapse mt-3 border-top pt-3" id="draw-${d.id}">
+          <div class="collapse mt-3 border-top border-secondary pt-3" id="draw-${d.id}">
             ${renderGames(games)}
           </div>
         </div>
@@ -150,7 +155,12 @@ function quickGlance(games) {
     return r ? (r.numbers || []).join('') : null;
   }).filter(Boolean);
   if (!top3.length) return '';
-  return `<span class="num-cell text-primary fw-medium">${top3.join(' &nbsp;|&nbsp; ')}</span>`;
+  const jp1 = games.find(x => /jackpot\s*1/i.test(x.game_name) && x.results[0]?.prize_amount);
+  const jp2 = games.find(x => /jackpot\s*2/i.test(x.game_name) && x.results[0]?.prize_amount);
+  let html = `<span class="num-cell fw-medium">${top3.join(' &nbsp;|&nbsp; ')}</span>`;
+  if (jp1) html += ` &nbsp;·&nbsp; <span class="text-warning-emphasis fw-medium"><i class="bi bi-trophy-fill"></i> JP1 RM ${parseFloat(jp1.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>`;
+  if (jp2) html += ` &nbsp;·&nbsp; <span class="text-warning-emphasis fw-medium">JP2 RM ${parseFloat(jp2.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>`;
+  return html;
 }
 
 function renderGames(games) {
@@ -163,7 +173,7 @@ function renderGames(games) {
       const isJpTier = /jackpot/i.test(r.prize_tier);
       return `<div class="row g-1 tier-row align-items-center py-1 px-2 rounded ${isJpTier ? 'jp-badge' : ''}">
         <div class="col-12 col-sm-4 col-md-3"><small class="fw-medium">${r.prize_tier}</small></div>
-        <div class="col-8 col-sm-5 col-md-6"><small class="num-cell text-primary">${nums}</small></div>
+        <div class="col-8 col-sm-5 col-md-6"><small class="num-cell">${nums}</small></div>
         <div class="col-4 col-sm-3 col-md-3 text-end"><small class="fw-medium ${isJpTier ? 'text-warning-emphasis' : 'text-success'}">${amt}</small></div>
       </div>`;
     }).join('');
@@ -172,7 +182,7 @@ function renderGames(games) {
         ${isJp ? '<i class="bi bi-trophy-fill text-warning me-1"></i>' : '<i class="bi bi-grid-fill text-secondary me-1"></i>'}
         ${g.game_name}
       </h6>
-      <div class="border rounded bg-white">${tiers}</div>
+      <div class="game-box p-2">${tiers}</div>
     </div>`;
   }).join('');
 }

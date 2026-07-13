@@ -21,11 +21,15 @@ async function scrapeDamacai(page) {
       data.drawLabel = drawMatch[2];
     }
 
-    const jpPattern = /(1\+3D Jackpot \d|3D Jackpot|DMC Jackpot \d|3\+3D \d+(?:st|nd|rd) Prize Bonus)\s*RM\s*([\d,]+\.\d{2})/gi;
+    const resultsOnly = text.match(/winning numbers[\s\S]*/i);
+    const targetText = resultsOnly ? resultsOnly[0] : text;
+    const jpPattern = /(1\+3D Jackpot \d|3D Jackpot)\s*RM\s*([\d,]+\.\d{2})/gi;
     const jackpots = [];
     let m;
-    while ((m = jpPattern.exec(text)) !== null) {
-      jackpots.push({ label: m[1].trim(), amount: m[2].replace(/,/g, '') });
+    while ((m = jpPattern.exec(targetText)) !== null) {
+      const label = m[1].trim();
+      const existing = jackpots.find(j => j.label === label);
+      if (!existing) jackpots.push({ label, amount: m[2].replace(/,/g, '') });
     }
     if (jackpots.length) data.jackpots = jackpots;
 
