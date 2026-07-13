@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS draws (
     id SERIAL PRIMARY KEY,
     operator_id INTEGER NOT NULL REFERENCES operators(id),
     draw_date DATE NOT NULL,
-    draw_label VARCHAR(50),
+    draw_label VARCHAR(50) NOT NULL,
     scraped_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(operator_id, draw_date)
+    UNIQUE(operator_id, draw_label)
 );
 
 CREATE TABLE IF NOT EXISTS games (

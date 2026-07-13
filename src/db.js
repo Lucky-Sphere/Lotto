@@ -25,10 +25,10 @@ async function upsertDraw(operatorId, drawDate, drawLabel) {
   const { rows } = await query(
     `INSERT INTO draws (operator_id, draw_date, draw_label)
      VALUES ($1, $2, $3)
-     ON CONFLICT (operator_id, draw_date)
-     DO UPDATE SET draw_label = EXCLUDED.draw_label, scraped_at = NOW()
+     ON CONFLICT (operator_id, draw_label)
+     DO UPDATE SET draw_date = EXCLUDED.draw_date, scraped_at = NOW()
      RETURNING id`,
-    [operatorId, drawDate, drawLabel || null]
+    [operatorId, drawDate, drawLabel]
   );
   return rows[0].id;
 }
