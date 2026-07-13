@@ -1,6 +1,6 @@
 # Malaysia Lottery Scraper
 
-Headless web scraper for Malaysian lottery results using **Puppeteer** and **PostgreSQL**. Includes a responsive SPA viewer built with Bootstrap 5.
+Headless web scraper for Malaysian **4D lottery** results using **Puppeteer** and **PostgreSQL**. Includes a responsive SPA viewer built with Bootstrap 5. (Only 4D results are scraped — 5D, 6D, and other games are not currently extracted.)
 
 Tested on **Ubuntu 22.04 / 24.04 LTS** (WSL2 and bare-metal).
 
