@@ -24,48 +24,101 @@ async function scrapeSportstoto(page) {
     const data = { operator: 'Sports Toto', games: [] };
     const text = document.body.innerText || '';
 
-    const dateMatch = text.match(/(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})/i);
-    if (dateMatch) data.drawDate = dateMatch[1];
+    const recentSection = text.match(/RECENT RESULTS[\s\S]*?(?=Toto Lotto Games|$)/i);
+    if (recentSection) {
+      const sec = recentSection[0];
+      const dd = sec.match(/Draw Date\s*:\s*(\d{2}\/\d{2}\/\d{4})/i);
+      const dn = sec.match(/Draw No\.?\s*:?\s*([\d\/A-Z]+)/i);
+      if (dd) data.drawDate = dd[1];
+      if (dn) data.drawLabel = dn[1];
+    }
 
-    const gameSections = text.split(/\n{2,}/);
-    const knownGames = ['4D', '5D', '6D', 'SUPREME', 'POWER', 'STAR', 'JACKPOT', 'LOTTO'];
+    const sections = text.split(/\n{2,}/);
+    let i = 0;
 
-    for (const section of gameSections) {
-      const lines = section.split('\n').map(l => l.trim()).filter(Boolean);
-      if (lines.length < 2) continue;
+    while (i < sections.length) {
+      const sec = sections[i];
+      const header = sec.split('\n')[0].trim();
 
-      const header = lines[0];
-      const matchedGame = knownGames.find(g => header.toUpperCase().includes(g));
-      if (!matchedGame) continue;
+      if (header === 'First Prize\tSecond Prize\tThird Prize') {
+        const game = { name: 'Toto 4D', tiers: [] };
+        const lines = sec.split('\n').filter(Boolean);
+        let specialNums = [];
+        let consolNums = [];
+        let row = 1;
 
-      const game = { name: header, tiers: [] };
-      let currentTier = null;
-      let currentNumbers = [];
-
-      for (const line of lines.slice(1)) {
-        const tierMatch = line.match(/^(1st|2nd|3rd|\d+[th])\s+(Prize|Special|Consolation)/i);
-        if (tierMatch) {
-          if (currentTier && currentNumbers.length) {
-            game.tiers.push({ tier: currentTier, numbers: [...currentNumbers] });
+        while (row < lines.length) {
+          const line = lines[row].trim();
+          if (/^Special\s+Prize$/i.test(line)) {
+            row++;
+            while (row < lines.length && !/^Consolation\s+Prize$/i.test(lines[row].trim()) && !/^Toto\s+4D\s+Jackpot/i.test(lines[row].trim())) {
+              const nums = lines[row].trim().split(/[\s\t]+/).filter(p => /^\d{4}$/.test(p));
+              specialNums.push(...nums);
+              row++;
+            }
+            continue;
           }
-          currentTier = line;
-          currentNumbers = [];
-        } else {
-          const nums = line.split(/[\s,]+/).filter(n => /^\d{4,6}$/.test(n));
-          currentNumbers.push(...nums);
+          if (/^Consolation\s+Prize$/i.test(line)) {
+            row++;
+            while (row < lines.length && !/^Toto\s+4D\s+Jackpot/i.test(lines[row].trim())) {
+              const nums = lines[row].trim().split(/[\s\t]+/).filter(p => /^\d{4}$/.test(p));
+              consolNums.push(...nums);
+              row++;
+            }
+            continue;
+          }
+          if (/^Toto\s+4D\s+Jackpot/i.test(line)) break;
+          row++;
+        }
+
+        const tiers = [];
+        const topLine = lines[0];
+        const topParts = topLine.split('\t').map(s => s.trim()).filter(Boolean);
+        const prizeNames = ['1st Prize', '2nd Prize', '3rd Prize'];
+        if (lines.length > 1 && lines[1].trim()) {
+          const numParts = lines[1].trim().split('\t').filter(p => /^\d{4}$/.test(p));
+          numParts.forEach((n, idx) => {
+            if (idx < 3) tiers.push({ tier: prizeNames[idx], numbers: [n] });
+          });
+        }
+        if (specialNums.length) tiers.push({ tier: 'Special Prize', numbers: specialNums });
+        if (consolNums.length) tiers.push({ tier: 'Consolation Prize', numbers: consolNums });
+        if (tiers.length) {
+          game.tiers = tiers;
+          data.games.push(game);
         }
       }
-      if (currentTier && currentNumbers.length) {
-        game.tiers.push({ tier: currentTier, numbers: [...currentNumbers] });
+
+      if (/^Jackpot\s+1\s+RM/i.test(header)) {
+        const jp1Match = header.match(/RM\s+([\d,]+\.\d{2})/);
+        if (jp1Match) {
+          const amt = jp1Match[1].replace(/,/g, '');
+          data.games.push({
+            name: 'Toto 4D Jackpot 1',
+            tiers: [{ tier: 'Jackpot 1', amount: amt }]
+          });
+          if (!data.jackpots) data.jackpots = [];
+          data.jackpots.push({ label: 'Toto 4D Jackpot 1', amount: amt });
+        }
+        const jp2InSection = sec.match(/Jackpot\s+2\s+RM\s+([\d,]+\.\d{2})/i);
+        if (jp2InSection) {
+          const amt = jp2InSection[1].replace(/,/g, '');
+          data.games.push({
+            name: 'Toto 4D Jackpot 2',
+            tiers: [{ tier: 'Jackpot 2', amount: amt }]
+          });
+          if (!data.jackpots) data.jackpots = [];
+          data.jackpots.push({ label: 'Toto 4D Jackpot 2', amount: amt });
+        }
       }
 
-      if (game.tiers.length) data.games.push(game);
+      i++;
     }
 
     return data;
   });
 
-  console.log(`[Sports Toto] Found ${result.games.length} game(s)`);
+  console.log(`[Sports Toto] Found ${result.games.length} game(s), draw: ${result.drawDate || '?'} #${result.drawLabel || '?'}`);
   return result;
 }
 
