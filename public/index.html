@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malaysia Lottery Results</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #333; }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 260px; background: #1a1a2e; color: #fff; padding: 24px 0; flex-shrink: 0; }
+  .sidebar h1 { font-size: 18px; padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 16px; }
+  .operator-btn { display: block; width: 100%; padding: 12px 20px; text-align: left; background: none; border: none; color: #ccc; font-size: 14px; cursor: pointer; transition: all .15s; border-left: 3px solid transparent; }
+  .operator-btn:hover { background: rgba(255,255,255,.05); color: #fff; }
+  .operator-btn.active { background: rgba(255,255,255,.1); color: #fff; border-left-color: #4fc3f7; }
+  .operator-btn .badge { float: right; background: rgba(255,255,255,.15); padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+  .main { flex: 1; padding: 32px; overflow-y: auto; }
+  .main h2 { font-size: 22px; margin-bottom: 4px; }
+  .main .subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
+  .draw-card { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); cursor: pointer; transition: box-shadow .15s; }
+  .draw-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  .draw-card .draw-header { display: flex; justify-content: space-between; align-items: center; }
+  .draw-card .draw-date { font-size: 16px; font-weight: 600; }
+  .draw-card .draw-label { font-size: 13px; color: #888; margin-top: 2px; }
+  .draw-card .draw-meta { font-size: 12px; color: #999; }
+  .draw-card .arrow { font-size: 18px; color: #bbb; transition: transform .2s; }
+  .draw-card.open .arrow { transform: rotate(180deg); }
+  .draw-results { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #eee; }
+  .draw-card.open .draw-results { display: block; }
+  .game-section { margin-bottom: 16px; }
+  .game-section h4 { font-size: 14px; color: #1a1a2e; margin-bottom: 8px; }
+  .tier-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; margin-bottom: 4px; font-size: 13px; }
+  .tier-row:nth-child(odd) { background: #f8f9fa; }
+  .tier-row .tier-name { font-weight: 500; min-width: 120px; }
+  .tier-row .tier-numbers { font-family: 'Courier New', monospace; font-size: 14px; color: #1565c0; }
+  .tier-row .tier-amount { color: #2e7d32; font-weight: 500; }
+  .jackpot-row { display: flex; justify-content: space-between; padding: 6px 10px; border-radius: 6px; margin-bottom: 4px; font-size: 13px; background: #fff8e1; }
+  .jackpot-row .jp-label { font-weight: 500; }
+  .jackpot-row .jp-amount { color: #e65100; font-weight: 600; }
+  .empty { text-align: center; padding: 60px 20px; color: #999; }
+  .empty p { font-size: 15px; margin-bottom: 4px; }
+  .loading { text-align: center; padding: 40px; color: #888; }
+  .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #e0e0e0; border-top-color: #1a1a2e; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .placeholder { text-align: center; padding: 80px 20px; color: #bbb; }
+  .placeholder h3 { font-size: 18px; margin-bottom: 8px; color: #888; }
+  .placeholder p { font-size: 14px; }
+  @media (max-width: 768px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; padding: 16px 0; }
+    .sidebar h1 { padding: 0 16px 16px; }
+    .main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <h1>Malaysia Lottery</h1>
+    <nav id="operator-list"></nav>
+  </aside>
+  <main class="main">
+    <div id="content"></div>
+  </main>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+const api = async url => { const r = await fetch(url); if (!r.ok) throw Error(await r.text()); return r.json(); };
+
+let operators = [];
+
+async function loadOperators() {
+  operators = await api('/api/operators');
+  const nav = $('#operator-list');
+  nav.innerHTML = operators.map(o =>
+    `<button class="operator-btn" data-id="${o.id}" onclick="selectOperator(${o.id})">
+      ${o.name} <span class="badge">${o.draw_count}</span>
+    </button>`
+  ).join('');
+  if (operators.length) selectOperator(operators[0].id);
+}
+
+async function selectOperator(id) {
+  $$('.operator-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.id) === id));
+  const op = operators.find(o => o.id === id);
+  const content = $('#content');
+  content.innerHTML = `<h2>${op.name}</h2><p class="subtitle">${op.website_url} · ${op.draw_count} draw(s)</p><div id="draws"><div class="loading"><div class="spinner"></div></div></div>`;
+  try {
+    const draws = await api(`/api/operators/${id}/draws`);
+    renderDraws(draws);
+  } catch (e) {
+    $('#draws').innerHTML = `<div class="empty"><p>Failed to load draws</p><p>${e.message}</p></div>`;
+  }
+}
+
+function renderDraws(draws) {
+  const container = $('#draws');
+  if (!draws.length) {
+    container.innerHTML = `<div class="empty"><p>No draws yet</p></div>`;
+    return;
+  }
+  container.innerHTML = draws.map(d => {
+    const dateStr = new Date(d.draw_date).toLocaleDateString('en-MY', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    const gameCount = (d.games || []).filter(g => g.results && g.results.length).length;
+    return `
+      <div class="draw-card" onclick="toggleDraw(this)">
+        <div class="draw-header">
+          <div>
+            <div class="draw-date">${dateStr}</div>
+            ${d.draw_label ? `<div class="draw-label">${d.draw_label}</div>` : ''}
+          </div>
+          <div class="draw-meta">${gameCount} game(s) · <span class="arrow">▾</span></div>
+        </div>
+        <div class="draw-results">${renderGames(d.games)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderGames(games) {
+  if (!games || !games.length) return '<div class="empty" style="padding:20px">No results</div>';
+  return games.map(g => {
+    if (!g.results || !g.results.length) return '';
+    const tiers = g.results.map(r => {
+      const nums = (r.numbers || []).join(' · ');
+      const amt = r.prize_amount ? `RM ${parseFloat(r.prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}` : '';
+      const isJackpot = /jackpot/i.test(r.prize_tier);
+      const cls = isJackpot ? 'jackpot-row' : 'tier-row';
+      return `<div class="${cls}">
+        <span class="tier-name">${r.prize_tier}</span>
+        <span class="tier-numbers">${nums}</span>
+        <span class="tier-amount">${amt}</span>
+      </div>`;
+    }).join('');
+    const isJp = /jackpot/i.test(g.game_name);
+    return `<div class="game-section">
+      <h4>${g.game_name}${isJp ? ' 🏆' : ''}</h4>
+      ${tiers}
+    </div>`;
+  }).join('');
+}
+
+function toggleDraw(el) {
+  el.classList.toggle('open');
+}
+
+loadOperators();
+</script>
+</body>
+</html>

@@ -69,4 +69,4 @@ async function scrapeSportstoto(page) {
   return result;
 }
 
-module.exports = { scrapeSportstoto };
+module.exports = { scrape: scrapeSportstoto };

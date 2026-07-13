@@ -90,4 +90,4 @@ async function scrapeMagnum4d(page) {
   return result;
 }
 
-module.exports = { scrapeMagnum4d };
+module.exports = { scrape: scrapeMagnum4d };

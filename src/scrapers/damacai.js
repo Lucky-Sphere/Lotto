@@ -103,4 +103,4 @@ async function scrapeDamacai(page) {
   return result;
 }
 
-module.exports = { scrapeDamacai };
+module.exports = { scrape: scrapeDamacai };
