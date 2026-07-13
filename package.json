@@ -1,0 +1,14 @@
+{
+  "name": "malaysia-lottery-scraper",
+  "version": "1.0.0",
+  "description": "Web scraper for Malaysian lottery results (Sports Toto, Magnum 4D, Da Ma Cai)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "migrate": "node src/migrate.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.0",
+    "puppeteer": "^23.0.0"
+  }
+}
