@@ -118,7 +118,7 @@ function renderDraws(draws) {
   container.innerHTML = draws.map(d => {
     const dt = new Date(d.draw_date);
     const dateStr = dt.toLocaleDateString('en-MY', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-    const games = (d.games || []).filter(g => g.results && g.results.length);
+    const games = (d.games || []).filter(g => g.results && g.results.length && !/^3D Jackpot$|^3\+3D /i.test(g.game_name));
     const top3 = quickGlance(games);
     return `
       <div class="card draw-card border-0 shadow-sm mb-3" data-bs-toggle="collapse" data-bs-target="#draw-${d.id}">
@@ -143,7 +143,7 @@ function renderDraws(draws) {
 }
 
 function quickGlance(games) {
-  const g = games.find(x => /4d/i.test(x.game_name) && !/jackpot/i.test(x.game_name));
+  const g = games.find(x => (/4d/i.test(x.game_name) || /1\+3d/i.test(x.game_name)) && !/jackpot/i.test(x.game_name));
   if (!g) return '';
   const top3 = ['1st Prize', '2nd Prize', '3rd Prize'].map(t => {
     const r = g.results.find(x => x.prize_tier === t);
