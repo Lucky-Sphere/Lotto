@@ -22,6 +22,7 @@
   .draw-card .draw-header { display: flex; justify-content: space-between; align-items: center; }
   .draw-card .draw-date { font-size: 16px; font-weight: 600; }
   .draw-card .draw-label { font-size: 13px; color: #888; margin-top: 2px; }
+  .draw-card .draw-no { display: inline-block; background: #e3f2fd; color: #1565c0; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-top: 4px; }
   .draw-card .draw-meta { font-size: 12px; color: #999; }
   .draw-card .arrow { font-size: 18px; color: #bbb; transition: transform .2s; }
   .draw-card.open .arrow { transform: rotate(180deg); }
@@ -110,7 +111,7 @@ function renderDraws(draws) {
         <div class="draw-header">
           <div>
             <div class="draw-date">${dateStr}</div>
-            ${d.draw_label ? `<div class="draw-label">${d.draw_label}</div>` : ''}
+            ${d.draw_label ? `<div class="draw-no">Draw No: ${d.draw_label}</div>` : ''}
           </div>
           <div class="draw-meta">${gameCount} game(s) · <span class="arrow">▾</span></div>
         </div>

@@ -97,8 +97,6 @@ async function scrapeSportstoto(page) {
             name: 'Toto 4D Jackpot 1',
             tiers: [{ tier: 'Jackpot 1', amount: amt }]
           });
-          if (!data.jackpots) data.jackpots = [];
-          data.jackpots.push({ label: 'Toto 4D Jackpot 1', amount: amt });
         }
         const jp2InSection = sec.match(/Jackpot\s+2\s+RM\s+([\d,]+\.\d{2})/i);
         if (jp2InSection) {
@@ -107,8 +105,6 @@ async function scrapeSportstoto(page) {
             name: 'Toto 4D Jackpot 2',
             tiers: [{ tier: 'Jackpot 2', amount: amt }]
           });
-          if (!data.jackpots) data.jackpots = [];
-          data.jackpots.push({ label: 'Toto 4D Jackpot 2', amount: amt });
         }
       }
 

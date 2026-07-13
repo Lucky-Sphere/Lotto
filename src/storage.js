@@ -9,14 +9,17 @@ async function saveScrapedResult(result) {
 
   let drawDate;
   if (result.drawDate) {
-    const parsed = new Date(result.drawDate);
-    if (!isNaN(parsed.getTime())) {
-      drawDate = parsed;
+    const m = result.drawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) {
+      drawDate = new Date(`${m[3]}-${m[2]}-${m[1]}`);
+    } else {
+      const parsed = new Date(result.drawDate);
+      if (!isNaN(parsed.getTime())) drawDate = parsed;
     }
   }
   if (!drawDate) drawDate = new Date();
 
-  const drawLabel = result.drawDate || null;
+  const drawLabel = result.drawLabel || null;
   const drawId = await db.upsertDraw(operatorId, drawDate, drawLabel);
 
   for (const game of (result.games || [])) {
