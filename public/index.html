@@ -119,25 +119,38 @@ function renderDraws(draws) {
     const dt = new Date(d.draw_date);
     const dateStr = dt.toLocaleDateString('en-MY', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     const games = (d.games || []).filter(g => g.results && g.results.length);
+    const top3 = quickGlance(games);
     return `
       <div class="card draw-card border-0 shadow-sm mb-3" data-bs-toggle="collapse" data-bs-target="#draw-${d.id}">
         <div class="card-body py-3">
           <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="fw-semibold">${dateStr}</div>
-              ${d.draw_label ? `<span class="badge bg-info bg-opacity-10 text-info-emphasis mt-1"><i class="bi bi-hash me-1"></i>${d.draw_label}</span>` : ''}
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="fw-semibold">${dateStr}</span>
+              ${d.draw_label ? `<span class="badge bg-info bg-opacity-10 text-info-emphasis"><i class="bi bi-hash me-1"></i>${d.draw_label}</span>` : ''}
             </div>
             <div class="d-flex align-items-center gap-2 text-muted small">
               <span>${games.length} game(s)</span>
               <i class="bi bi-chevron-down collapse-icon"></i>
             </div>
           </div>
+          ${top3 ? `<div class="mt-2 small text-muted">${top3}</div>` : ''}
           <div class="collapse mt-3 border-top pt-3" id="draw-${d.id}">
             ${renderGames(games)}
           </div>
         </div>
       </div>`;
   }).join('');
+}
+
+function quickGlance(games) {
+  const g = games.find(x => /4d/i.test(x.game_name) && !/jackpot/i.test(x.game_name));
+  if (!g) return '';
+  const top3 = ['1st Prize', '2nd Prize', '3rd Prize'].map(t => {
+    const r = g.results.find(x => x.prize_tier === t);
+    return r ? (r.numbers || []).join('') : null;
+  }).filter(Boolean);
+  if (!top3.length) return '';
+  return `<span class="num-cell text-primary fw-medium">${top3.join(' &nbsp;|&nbsp; ')}</span>`;
 }
 
 function renderGames(games) {
