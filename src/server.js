@@ -15,7 +15,11 @@ app.get('/api/operators', async (req, res) => {
       LEFT JOIN draws d ON d.operator_id = o.id
       LEFT JOIN draw_results dr ON dr.draw_id = d.id
       GROUP BY o.id
-      ORDER BY o.name
+      ORDER BY CASE o.name
+        WHEN 'Magnum 4D' THEN 1
+        WHEN 'Sports Toto' THEN 2
+        WHEN 'Da Ma Cai' THEN 3
+      END
     `);
     res.json(rows);
   } catch (err) {
