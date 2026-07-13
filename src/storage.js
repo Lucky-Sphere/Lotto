@@ -22,6 +22,8 @@ async function saveScrapedResult(result) {
   const drawLabel = result.drawLabel || null;
   const drawId = await db.upsertDraw(operatorId, drawDate, drawLabel);
 
+  await db.query('DELETE FROM draw_results WHERE draw_id = $1', [drawId]);
+
   for (const game of (result.games || [])) {
     const gameId = await db.upsertGame(operatorId, game.name);
     for (const tier of (game.tiers || [])) {
