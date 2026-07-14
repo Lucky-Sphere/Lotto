@@ -144,15 +144,6 @@ async function run() {
       writeState(state);
     }
 
-    const targetDate = state[key].nextDate;
-    const targetYear = parseInt(targetDate.split('-')[0]);
-    if (targetYear < TARGET_YEAR) {
-      console.log(`[${key}] Reached year ${TARGET_YEAR}, marking complete.`);
-      state[key].complete = true;
-      writeState(state);
-      continue;
-    }
-
     let browser;
     try {
       browser = await puppeteer.launch(config.puppeteer);
@@ -161,22 +152,33 @@ async function run() {
         'Accept-Language': 'en-US,en;q=0.9',
       });
 
-      console.log(`\n[${key}] Scraping: ${targetDate}`);
-      const result = await scrapeHistorical(page, key, targetDate);
+      let current = state[key].nextDate;
+      while (parseInt(current.split('-')[0]) >= TARGET_YEAR) {
+        console.log(`\n[${key}] Scraping: ${current}`);
+        const result = await scrapeHistorical(page, key, current);
 
-      if (result && result.drawDate) {
-        await saveScrapedResult(result);
-        state[key].nextDate = prevDay(targetDate);
+        if (result && result.drawDate) {
+          await saveScrapedResult(result);
+          state[key].nextDate = prevDay(current);
+          writeState(state);
+          console.log(`[${key}] Saved. Next target: ${state[key].nextDate}`);
+          break;
+        } else {
+          current = prevDay(current);
+          state[key].nextDate = current;
+          writeState(state);
+          console.log(`[${key}] No data, skipping to ${current}`);
+        }
+      }
+
+      if (parseInt(current.split('-')[0]) < TARGET_YEAR) {
+        console.log(`[${key}] Reached year ${TARGET_YEAR}, marking complete.`);
+        state[key].complete = true;
         writeState(state);
-        console.log(`[${key}] Saved. Next target: ${state[key].nextDate}`);
-      } else {
-        state[key].nextDate = prevDay(targetDate);
-        writeState(state);
-        console.log(`[${key}] No data, skipping to ${state[key].nextDate}`);
       }
     } catch (err) {
       console.error(`[${key}] Error: ${err.message}`);
-      state[key].nextDate = prevDay(targetDate);
+      state[key].nextDate = prevDay(state[key].nextDate);
       writeState(state);
     } finally {
       if (browser) await browser.close();
