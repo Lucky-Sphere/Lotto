@@ -82,6 +82,9 @@ const api = async url => { const r = await fetch(url); if (!r.ok) throw Error(aw
 let operators = [];
 let currentOpId = null;
 let currentView = 'dashboard';
+let currentPage = 1;
+let currentFilterFrom = null;
+let currentFilterTo = null;
 
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('d-none');
@@ -350,17 +353,19 @@ async function loadOperators() {
   showDashboard();
 }
 
-async function loadDraws(id, from, to) {
+async function loadDraws(id, from, to, page) {
   const params = new URLSearchParams();
   if (from) params.set('from', from);
   if (to) params.set('to', to);
+  params.set('page', page || 1);
   const qs = params.toString();
   const url = `/api/operators/${id}/draws${qs ? '?' + qs : ''}`;
   const el = document.getElementById('draws');
   showLoading(el);
   try {
-    const draws = await api(url);
-    renderDraws(draws);
+    const data = await api(url);
+    currentPage = data.page;
+    renderDraws(data);
   } catch (e) {
     el.innerHTML =
       `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Failed to load draws</p><small>${e.message}</small></div>`;
@@ -370,6 +375,9 @@ async function loadDraws(id, from, to) {
 async function selectOperator(id) {
   currentOpId = id;
   currentView = 'operator';
+  currentPage = 1;
+  currentFilterFrom = null;
+  currentFilterTo = null;
   setNavActive('nav-op-' + id);
   const op = operators.find(o => o.id === id);
   const content = document.getElementById('content');
@@ -394,24 +402,29 @@ async function selectOperator(id) {
     defaultDate: ["today", "today"],
     onChange: function(selectedDates) {
       if (selectedDates.length === 2) {
-        const from = flatpickr.formatDate(selectedDates[0], "Y-m-d");
-        const to = flatpickr.formatDate(selectedDates[1], "Y-m-d");
-        loadDraws(id, from, to);
+        currentFilterFrom = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+        currentFilterTo = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+        currentPage = 1;
+        loadDraws(id, currentFilterFrom, currentFilterTo, 1);
       }
     }
   });
-  loadDraws(id);
+  loadDraws(id, null, null, 1);
   return false;
 }
 
 function clearDateFilter() {
   const fp = document.getElementById('date-range')?._flatpickr;
   if (fp) fp.clear();
-  loadDraws(currentOpId);
+  currentFilterFrom = null;
+  currentFilterTo = null;
+  currentPage = 1;
+  loadDraws(currentOpId, null, null, 1);
 }
 
-function renderDraws(draws) {
+function renderDraws(data) {
   const container = document.getElementById('draws');
+  const { draws, page, totalPages, total } = data;
   if (!draws.length) {
     container.innerHTML = `<div class="text-center py-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i><p class="mb-0">No draws yet</p></div>`;
     return;
@@ -440,6 +453,34 @@ function renderDraws(draws) {
         </div>
       </div>`;
   }).join('');
+
+  if (totalPages > 1) {
+    const range = [];
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i - page) <= 2) {
+        range.push(i);
+      } else if (range[range.length - 1] !== '...') {
+        range.push('...');
+      }
+    }
+    container.innerHTML += `
+      <div class="d-flex justify-content-between align-items-center mt-3 mb-2 flex-wrap gap-2">
+        <small class="text-muted">Page ${page} of ${totalPages} (${total} draws)</small>
+        <div class="d-flex gap-1">
+          ${page > 1 ? `<button class="btn btn-sm btn-outline-secondary" onclick="goPage(${page - 1})"><i class="bi bi-chevron-left"></i></button>` : ''}
+          ${range.map(p => p === '...' ? '<span class="btn btn-sm btn-outline-secondary disabled">...</span>'
+            : `<button class="btn btn-sm ${p === page ? 'btn-info' : 'btn-outline-secondary'}" onclick="goPage(${p})">${p}</button>`
+          ).join('')}
+          ${page < totalPages ? `<button class="btn btn-sm btn-outline-secondary" onclick="goPage(${page + 1})"><i class="bi bi-chevron-right"></i></button>` : ''}
+        </div>
+      </div>`;
+  }
+}
+
+function goPage(p) {
+  currentPage = p;
+  loadDraws(currentOpId, currentFilterFrom, currentFilterTo, p);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function quickGlance(games) {

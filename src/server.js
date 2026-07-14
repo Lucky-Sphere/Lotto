@@ -111,12 +111,23 @@ app.get('/api/operators', async (req, res) => {
 app.get('/api/operators/:id/draws', async (req, res) => {
   try {
     const { from, to } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = 20;
+    const offset = (page - 1) * limit;
+
+    const { rows: [{ total }] } = await db.query(`
+      SELECT COUNT(*) AS total FROM draws WHERE operator_id = $1
+        AND ($2::date IS NULL OR draw_date >= $2::date)
+        AND ($3::date IS NULL OR draw_date <= $3::date)
+    `, [req.params.id, from || null, to || null]);
+
     const { rows: draws } = await db.query(`
       SELECT * FROM draws WHERE operator_id = $1
         AND ($2::date IS NULL OR draw_date >= $2::date)
         AND ($3::date IS NULL OR draw_date <= $3::date)
       ORDER BY draw_date DESC, scraped_at DESC
-    `, [req.params.id, from || null, to || null]);
+      LIMIT $4 OFFSET $5
+    `, [req.params.id, from || null, to || null, limit, offset]);
     for (const draw of draws) {
       const { rows: games } = await db.query(`
         SELECT g.id, g.name AS game_name, json_agg(json_build_object(
@@ -129,7 +140,8 @@ app.get('/api/operators/:id/draws', async (req, res) => {
       `, [draw.id]);
       draw.games = games;
     }
-    res.json(draws);
+    const totalPages = Math.ceil(parseInt(total) / limit);
+    res.json({ draws, page, totalPages, total: parseInt(total) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
