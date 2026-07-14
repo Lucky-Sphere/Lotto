@@ -1,0 +1,271 @@
+=== Malaysia Lottery Scraper ===
+
+
+--- Scraping: sportstoto ---
+[Sports Toto] Navigating...
+[Sports Toto] Title: Welcome to Sports Toto's Official Website Go For It!
+[Sports Toto] Found 3 game(s), draw: 12/07/2026 #6156/26
+Result: {
+  "operator": "Sports Toto",
+  "games": [
+    {
+      "name": "Toto 4D",
+      "tiers": [
+        {
+          "tier": "1st Prize",
+          "numbers": [
+            "6485"
+          ]
+        },
+        {
+          "tier": "2nd Prize",
+          "numbers": [
+            "4994"
+          ]
+        },
+        {
+          "tier": "3rd Prize",
+          "numbers": [
+            "4965"
+          ]
+        },
+        {
+          "tier": "Special Prize",
+          "numbers": [
+            "3468",
+            "5313",
+            "2981",
+            "7948",
+            "6670",
+            "6451",
+            "2423",
+            "5716",
+            "7853",
+            "0561"
+          ]
+        },
+        {
+          "tier": "Consolation Prize",
+          "numbers": [
+            "8079",
+            "1648",
+            "8091",
+            "7579",
+            "8814",
+            "2101",
+            "5560",
+            "8632",
+            "5097",
+            "2369"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Toto 4D Jackpot 1",
+      "tiers": [
+        {
+          "tier": "Jackpot 1",
+          "amount": "5186878.04"
+        }
+      ]
+    },
+    {
+      "name": "Toto 4D Jackpot 2",
+      "tiers": [
+        {
+          "tier": "Jackpot 2",
+          "amount": "151017.90"
+        }
+      ]
+    }
+  ],
+  "drawDate": "12/07/2026",
+  "drawLabel": "6156/26"
+}
+  [Storage] Toto 4D / 1st Prize: 1 number(s)
+  [Storage] Toto 4D / 2nd Prize: 1 number(s)
+  [Storage] Toto 4D / 3rd Prize: 1 number(s)
+  [Storage] Toto 4D / Special Prize: 10 number(s)
+  [Storage] Toto 4D / Consolation Prize: 10 number(s)
+  [Storage] Toto 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 5186878.04)
+  [Storage] Toto 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 151017.9)
+
+--- Scraping: magnum4d ---
+[Magnum 4D] Navigating...
+[Magnum 4D] Title: Magnum4D | Home
+[Magnum 4D] Found 3 game(s), draw: 12/07/2026 #393/26
+Result: {
+  "operator": "Magnum 4D",
+  "games": [
+    {
+      "name": "4D Classic",
+      "tiers": [
+        {
+          "tier": "1st Prize",
+          "numbers": [
+            "8723"
+          ]
+        },
+        {
+          "tier": "2nd Prize",
+          "numbers": [
+            "8567"
+          ]
+        },
+        {
+          "tier": "3rd Prize",
+          "numbers": [
+            "7439"
+          ]
+        },
+        {
+          "tier": "Special Prize",
+          "numbers": [
+            "6972",
+            "1521",
+            "7956",
+            "5143",
+            "8220",
+            "7794",
+            "4254",
+            "6203",
+            "4640",
+            "1372"
+          ]
+        },
+        {
+          "tier": "Consolation Prize",
+          "numbers": [
+            "3019",
+            "0441",
+            "8438",
+            "2762",
+            "8578",
+            "8332",
+            "1750",
+            "9846",
+            "7620",
+            "0450"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4D Jackpot 1",
+      "tiers": [
+        {
+          "tier": "Jackpot 1",
+          "amount": "4842710.35"
+        }
+      ]
+    },
+    {
+      "name": "4D Jackpot 2",
+      "tiers": [
+        {
+          "tier": "Jackpot 2",
+          "amount": "250518.52"
+        }
+      ]
+    }
+  ],
+  "drawLabel": "393/26",
+  "drawDate": "12/07/2026"
+}
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 4842710.35)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 250518.52)
+
+--- Scraping: damacai ---
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+Result: {
+  "operator": "Da Ma Cai",
+  "games": [
+    {
+      "name": "1+3D",
+      "tiers": [
+        {
+          "tier": "1st Prize",
+          "numbers": [
+            "7425"
+          ]
+        },
+        {
+          "tier": "2nd Prize",
+          "numbers": [
+            "1413"
+          ]
+        },
+        {
+          "tier": "3rd Prize",
+          "numbers": [
+            "8682"
+          ]
+        },
+        {
+          "tier": "Starter Prizes",
+          "numbers": [
+            "5120",
+            "9592",
+            "5429",
+            "6774",
+            "9479",
+            "7021",
+            "6908",
+            "2046",
+            "0603",
+            "8182"
+          ]
+        },
+        {
+          "tier": "Consolation Prizes",
+          "numbers": [
+            "6603",
+            "7402",
+            "6869",
+            "6168",
+            "9490",
+            "7720",
+            "9723",
+            "0156",
+            "6067",
+            "6262"
+          ]
+        }
+      ]
+    }
+  ],
+  "drawDate": "12/07/2026",
+  "drawLabel": "6103/26",
+  "jackpots": [
+    {
+      "label": "1+3D Jackpot 1",
+      "amount": "3030585.20"
+    },
+    {
+      "label": "1+3D Jackpot 2",
+      "amount": "100000.00"
+    },
+    {
+      "label": "3D Jackpot",
+      "amount": "919092.40"
+    }
+  ]
+}
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+
+=== Done ===

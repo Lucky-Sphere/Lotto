@@ -1,0 +1,302 @@
+=== Backfill Scraper ===
+
+
+[sportstoto] Scraping: 2026-07-03
+  [Backfill sportstoto] Attempting date: 2026-07-03
+[Sports Toto History] Target date: 2026-07-03
+[Sports Toto History] Loading month: https://www.sportstoto.com.my/results_past.asp?date=7/3/2026
+[Sports Toto History] No draw found for 2026-07-03
+[sportstoto] No data, skipping to 2026-07-02
+
+[magnum4d] Scraping: 2026-07-11
+  [Backfill magnum4d] Attempting date: 2026-07-11
+  [Backfill magnum4d] Trying URL: https://www.magnum4d.my/result?date=2026-07-11
+[Magnum 4D] Navigating...
+[Magnum 4D] Title: Magnum4D | Home
+[Magnum 4D] Found 3 game(s), draw: 12/07/2026 #393/26
+  [Backfill magnum4d] Got draw: 12/07/2026 #393/26
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 4842710.35)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 250518.52)
+[magnum4d] Saved. Next target: 2026-07-10
+
+[damacai] Scraping: 2026-07-11
+  [Backfill damacai] Attempting date: 2026-07-11
+  [Backfill damacai] Trying URL: https://www.damacai.com.my/home?date=11/07/2026
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+  [Backfill damacai] Got draw: 12/07/2026 #6103/26
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+[damacai] Saved. Next target: 2026-07-10
+
+=== Backfill Done ===
+=== Backfill Scraper ===
+
+
+[sportstoto] Scraping: 2026-07-01
+  [Backfill sportstoto] Attempting date: 2026-07-01
+[Sports Toto History] Target date: 2026-07-01
+[Sports Toto History] Loading month: https://www.sportstoto.com.my/results_past.asp?date=7/1/2026
+[Sports Toto History] Found draw: 6151/26
+[Sports Toto History] Got draw: 01/07/2026 #6151/26, 3 game(s)
+  [Storage] Toto 4D / 1st Prize: 1 number(s)
+  [Storage] Toto 4D / 2nd Prize: 1 number(s)
+  [Storage] Toto 4D / 3rd Prize: 1 number(s)
+  [Storage] Toto 4D / Special Prize: 10 number(s)
+  [Storage] Toto 4D / Consolation Prize: 10 number(s)
+  [Storage] Toto 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 4305629.6)
+  [Storage] Toto 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 139516.63)
+[sportstoto] Saved. Next target: 2026-06-30
+
+[magnum4d] Scraping: 2026-07-09
+  [Backfill magnum4d] Attempting date: 2026-07-09
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 3788862.71)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 130872.06)
+[magnum4d] Saved. Next target: 2026-07-08
+
+[damacai] Scraping: 2026-07-09
+  [Backfill damacai] Attempting date: 2026-07-09
+  [Backfill damacai] Trying URL: https://www.damacai.com.my/home?date=09/07/2026
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+  [Backfill damacai] Got draw: 12/07/2026 #6103/26
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+[damacai] Saved. Next target: 2026-07-08
+
+=== Backfill Done ===
+=== Backfill Scraper ===
+
+
+[sportstoto] Scraping: 2026-06-30
+  [Backfill sportstoto] Attempting date: 2026-06-30
+[Sports Toto History] Target date: 2026-06-30
+[Sports Toto History] Loading month: https://www.sportstoto.com.my/results_past.asp?date=6/30/2026
+[Sports Toto History] No draw found for 2026-06-30
+[sportstoto] No data, skipping to 2026-06-29
+
+[magnum4d] Scraping: 2026-07-08
+  [Backfill magnum4d] Attempting date: 2026-07-08
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 3788862.71)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 130872.06)
+[magnum4d] Saved. Next target: 2026-07-07
+
+[damacai] Scraping: 2026-07-08
+  [Backfill damacai] Attempting date: 2026-07-08
+  [Backfill damacai] Trying URL: https://www.damacai.com.my/home?date=08/07/2026
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+  [Backfill damacai] Got draw: 12/07/2026 #6103/26
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+[damacai] Saved. Next target: 2026-07-07
+
+=== Backfill Done ===
+=== Backfill Scraper ===
+
+
+[sportstoto] Scraping: 2026-06-29
+  [Backfill sportstoto] Attempting date: 2026-06-29
+[Sports Toto History] Target date: 2026-06-29
+[Sports Toto History] Loading month: https://www.sportstoto.com.my/results_past.asp?date=6/29/2026
+[Sports Toto History] No draw found for 2026-06-29
+[sportstoto] No data, skipping to 2026-06-28
+
+[magnum4d] Scraping: 2026-07-07
+  [Backfill magnum4d] Attempting date: 2026-07-07
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 3452699.68)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 255575.96)
+[magnum4d] Saved. Next target: 2026-07-06
+
+[damacai] Scraping: 2026-07-07
+  [Backfill damacai] Attempting date: 2026-07-07
+  [Backfill damacai] Trying URL: https://www.damacai.com.my/home?date=07/07/2026
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+  [Backfill damacai] Got draw: 12/07/2026 #6103/26
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+[damacai] Saved. Next target: 2026-07-06
+
+=== Backfill Done ===
+=== Backfill Scraper ===
+
+
+[sportstoto] Scraping: 2026-06-28
+  [Backfill sportstoto] Attempting date: 2026-06-28
+[Sports Toto History] Target date: 2026-06-28
+[Sports Toto History] Loading month: https://www.sportstoto.com.my/results_past.asp?date=6/28/2026
+[Sports Toto History] Found draw: 6150/26
+[Sports Toto History] Got draw: 28/06/2026 #6150/26, 3 game(s)
+  [Storage] Toto 4D / 1st Prize: 1 number(s)
+  [Storage] Toto 4D / 2nd Prize: 1 number(s)
+  [Storage] Toto 4D / 3rd Prize: 1 number(s)
+  [Storage] Toto 4D / Special Prize: 10 number(s)
+  [Storage] Toto 4D / Consolation Prize: 10 number(s)
+  [Storage] Toto 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 3538288.13)
+  [Storage] Toto 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 141045.3)
+[sportstoto] Saved. Next target: 2026-06-27
+
+[magnum4d] Scraping: 2026-07-06
+  [Backfill magnum4d] Attempting date: 2026-07-06
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 3452699.68)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 255575.96)
+[magnum4d] Saved. Next target: 2026-07-05
+
+[damacai] Scraping: 2026-07-06
+  [Backfill damacai] Attempting date: 2026-07-06
+  [Backfill damacai] Trying URL: https://www.damacai.com.my/home?date=06/07/2026
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+  [Backfill damacai] Got draw: 12/07/2026 #6103/26
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+[damacai] Saved. Next target: 2026-07-05
+
+=== Backfill Done ===
+=== Backfill Scraper ===
+
+
+[sportstoto] Scraping: 2026-06-27
+  [Backfill sportstoto] Attempting date: 2026-06-27
+[Sports Toto History] Target date: 2026-06-27
+[Sports Toto History] Loading month: https://www.sportstoto.com.my/results_past.asp?date=6/27/2026
+[Sports Toto History] Found draw: 6149/26
+[Sports Toto History] Got draw: 27/06/2026 #6149/26, 3 game(s)
+  [Storage] Toto 4D / 1st Prize: 1 number(s)
+  [Storage] Toto 4D / 2nd Prize: 1 number(s)
+  [Storage] Toto 4D / 3rd Prize: 1 number(s)
+  [Storage] Toto 4D / Special Prize: 10 number(s)
+  [Storage] Toto 4D / Consolation Prize: 10 number(s)
+  [Storage] Toto 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 2762538.98)
+  [Storage] Toto 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 273715.86)
+[sportstoto] Saved. Next target: 2026-06-26
+
+[magnum4d] Scraping: 2026-07-05
+  [Backfill magnum4d] Attempting date: 2026-07-05
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 3452699.68)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 255575.96)
+[magnum4d] Saved. Next target: 2026-07-04
+
+[damacai] Scraping: 2026-07-05
+  [Backfill damacai] Attempting date: 2026-07-05
+  [Backfill damacai] Trying URL: https://www.damacai.com.my/home?date=05/07/2026
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+  [Backfill damacai] Got draw: 12/07/2026 #6103/26
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+[damacai] Saved. Next target: 2026-07-04
+
+=== Backfill Done ===
+=== Backfill Scraper ===
+
+
+[sportstoto] Scraping: 2026-06-26
+  [Backfill sportstoto] Attempting date: 2026-06-26
+[Sports Toto History] Target date: 2026-06-26
+[Sports Toto History] Loading month: https://www.sportstoto.com.my/results_past.asp?date=6/26/2026
+[Sports Toto History] No draw found for 2026-06-26
+[sportstoto] No data, skipping to 2026-06-25
+
+[magnum4d] Scraping: 2026-07-04
+  [Backfill magnum4d] Attempting date: 2026-07-04
+  [Storage] 4D Classic / 1st Prize: 1 number(s)
+  [Storage] 4D Classic / 2nd Prize: 1 number(s)
+  [Storage] 4D Classic / 3rd Prize: 1 number(s)
+  [Storage] 4D Classic / Special Prize: 10 number(s)
+  [Storage] 4D Classic / Consolation Prize: 10 number(s)
+  [Storage] 4D Jackpot 1 / Jackpot 1: 0 number(s) (RM 2732673.15)
+  [Storage] 4D Jackpot 2 / Jackpot 2: 0 number(s) (RM 133213.3)
+[magnum4d] Saved. Next target: 2026-07-03
+
+[damacai] Scraping: 2026-07-04
+  [Backfill damacai] Attempting date: 2026-07-04
+  [Backfill damacai] Trying URL: https://www.damacai.com.my/home?date=04/07/2026
+[Da Ma Cai] Navigating...
+[Da Ma Cai] Title: Da Ma Cai
+[Da Ma Cai] Found 1 game(s), 3 jackpot(s)
+  [Backfill damacai] Got draw: 12/07/2026 #6103/26
+  [Storage] 1+3D / 1st Prize: 1 number(s)
+  [Storage] 1+3D / 2nd Prize: 1 number(s)
+  [Storage] 1+3D / 3rd Prize: 1 number(s)
+  [Storage] 1+3D / Starter Prizes: 10 number(s)
+  [Storage] 1+3D / Consolation Prizes: 10 number(s)
+  [Storage] Jackpot 1+3D Jackpot 1: RM 3030585.20
+  [Storage] Jackpot 1+3D Jackpot 2: RM 100000.00
+  [Storage] Jackpot 3D Jackpot: RM 919092.40
+[damacai] Saved. Next target: 2026-07-03
+
+=== Backfill Done ===

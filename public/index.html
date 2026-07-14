@@ -6,6 +6,7 @@
 <title>Lucky Sphere Lotto</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   body { background: #0f0f1a; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #cfd8e3; }
@@ -41,7 +42,20 @@
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
-      <nav class="nav flex-column" id="operator-list"></nav>
+      <nav class="nav flex-column">
+        <a class="nav-link py-2 px-3 active" href="#" onclick="return showDashboard()" id="nav-dashboard">
+          <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        </a>
+        <div class="nav-sub-header mt-2 mb-1 px-3"><small class="text-secondary text-uppercase fw-semibold" style="font-size:11px;letter-spacing:1px;">Operators</small></div>
+        <div id="operator-list"></div>
+        <a class="nav-link py-2 px-3" href="#" onclick="return showSearch()" id="nav-search">
+          <i class="bi bi-search me-2"></i>Search
+        </a>
+        <hr class="my-2 border-secondary mx-3">
+        <a class="nav-link py-2 px-3" href="#" onclick="return showSettings()" id="nav-settings">
+          <i class="bi bi-gear me-2"></i>Settings
+        </a>
+      </nav>
     </aside>
     <main class="col-md-9 col-lg-10 p-3 p-md-4" id="main-content">
       <div class="d-flex align-items-center mb-3 d-md-none">
@@ -61,11 +75,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
 const api = async url => { const r = await fetch(url); if (!r.ok) throw Error(await r.text()); return r.json(); };
 
 let operators = [];
 let currentOpId = null;
+let currentView = 'dashboard';
 
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('d-none');
@@ -75,23 +91,286 @@ function showLoading(container) {
   container.innerHTML = `<div class="text-center py-5 text-muted"><div class="spinner-border text-secondary mb-2" role="status"></div><p class="mb-0">Loading...</p></div>`;
 }
 
+function setNavActive(id) {
+  document.querySelectorAll('#sidebar .nav-link').forEach(l => l.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function showDashboard() {
+  currentView = 'dashboard';
+  currentOpId = null;
+  setNavActive('nav-dashboard');
+  if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('d-none');
+  renderDashboard();
+  return false;
+}
+
+function showSettings() {
+  currentView = 'settings';
+  currentOpId = null;
+  setNavActive('nav-settings');
+  if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('d-none');
+  renderSettings();
+  return false;
+}
+
+async function renderDashboard() {
+  const content = document.getElementById('content');
+  document.getElementById('mobile-title').textContent = 'Dashboard';
+  content.innerHTML = `
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <h2 class="h4 mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+    </div>
+    <div id="dashboard-content"></div>`;
+  showLoading(document.getElementById('dashboard-content'));
+  try {
+    const data = await api('/api/dashboard');
+    const cont = document.getElementById('dashboard-content');
+    cont.innerHTML = `
+      <div class="row g-3" id="op-cards">
+        ${data.operators.map(op => {
+          const g = op.latestDraw && (op.latestDraw.games || []).find(x => /4d|1\+3d/i.test(x.game_name) && !/jackpot/i.test(x.game_name));
+          const top3 = g ? ['1st Prize','2nd Prize','3rd Prize'].map(t => {
+            const r = g.results.find(x => x.prize_tier === t);
+            return r ? (r.numbers||[]).join('') : null;
+          }).filter(Boolean) : [];
+          const jp1 = op.latestDraw && (op.latestDraw.games||[]).find(x => /jackpot\s*1/i.test(x.game_name));
+          const jp2 = op.latestDraw && (op.latestDraw.games||[]).find(x => /jackpot\s*2/i.test(x.game_name));
+          const dt = op.latestDraw ? new Date(op.latestDraw.draw_date) : null;
+          const dateStr = dt ? dt.toLocaleDateString('en-MY', { weekday:'short', year:'numeric', month:'short', day:'numeric' }) : '';
+          return `<div class="col-12">
+            <div class="card draw-card border-0 p-4 h-100" onclick="return selectOperator(${op.id})" style="cursor:pointer;">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h4 class="mb-0 fw-bold">${op.name}</h4>
+                <a href="${op.website_url}" target="_blank" class="text-muted" title="Visit website"><i class="bi bi-box-arrow-up-right"></i></a>
+              </div>
+              ${op.latestDraw ? `<div class="mb-2"><span class="fw-medium fs-6">${dateStr}</span>${op.latestDraw.draw_label ? ` <span class="badge bg-info bg-opacity-10 text-info-emphasis fs-6">#${op.latestDraw.draw_label}</span>` : ''}</div>` : '<div class="text-muted mb-2">No draws yet</div>'}
+              ${top3.length ? `<div class="num-cell fw-medium mb-2" style="font-size:1.4rem">${top3.join(' · ')}</div>` : ''}
+              <div class="fs-6">
+                ${jp1 ? `<span class="text-warning-emphasis fw-medium"><i class="bi bi-trophy-fill"></i> ${parseFloat(jp1.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>` : ''}
+                ${jp2 ? `<span class="text-warning-emphasis fw-medium ms-3"><i class="bi bi-trophy-fill text-secondary"></i> ${parseFloat(jp2.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>` : ''}
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } catch (e) {
+    document.getElementById('dashboard-content').innerHTML =
+      `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Failed to load dashboard</p><small>${e.message}</small></div>`;
+  }
+}
+
+async function renderSettings() {
+  const content = document.getElementById('content');
+  document.getElementById('mobile-title').textContent = 'Settings';
+  content.innerHTML = `
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <h2 class="h4 mb-0"><i class="bi bi-gear me-2"></i>Settings</h2>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card draw-card border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-clock fs-4 text-warning"></i>
+              <h5 class="card-title mb-0">Midnight Scrape</h5>
+            </div>
+            <p class="small text-muted mb-0">Fetches the latest results from all 3 operators every night at midnight.</p>
+            <pre class="small mt-2 mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;overflow-x:auto;user-select:all;">0 0 * * * cd /var/www/html/lotto && bash cron_midnight.sh</pre>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card draw-card border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-arrow-repeat fs-4 text-info"></i>
+              <h5 class="card-title mb-0">Historical Backfill</h5>
+            </div>
+            <p class="small text-muted mb-0">Every 30 minutes, goes back <strong>1 day</strong> further into history per operator until <strong>1960</strong>.</p>
+            <pre class="small mt-2 mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;overflow-x:auto;user-select:all;">*/30 * * * * cd /var/www/html/lotto && bash cron_backfill.sh</pre>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card draw-card border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-activity fs-4 text-success"></i>
+              <h5 class="card-title mb-0">Backfill Progress</h5>
+            </div>
+            <div id="backfill-state" class="small text-muted py-3 text-center">Loading...</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card draw-card border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-info-circle fs-4 text-secondary"></i>
+              <h5 class="card-title mb-0">State File</h5>
+            </div>
+            <p class="small text-muted mb-0">Progress is tracked in <code class="text-info">backfill_state.json</code>. Each operator has its own <code>nextDate</code> and <code>complete</code> flag. Once 1960 is reached, backfill marks itself done.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card draw-card border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-journal-text fs-4 text-warning"></i>
+              <h5 class="card-title mb-0">Logs</h5>
+            </div>
+            <pre class="small mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;max-height:160px;overflow-y:auto;">
+logs/midnight.log
+logs/backfill.log</pre>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  try {
+    const state = await api('/api/settings');
+    const el = document.getElementById('backfill-state');
+    const keys = Object.keys(state);
+    if (!keys.length) {
+      el.innerHTML = `<span class="text-muted">No backfill state yet — runs on the next cron cycle.</span>`;
+    } else {
+      el.innerHTML = `<div class="row g-2">${keys.map(k => {
+        const s = state[k];
+        const pct = s.complete ? 100 : 0;
+        const status = s.complete
+          ? '<span class="text-success fw-medium"><i class="bi bi-check-circle-fill"></i> Complete</span>'
+          : `<span class="text-info fw-medium"><i class="bi bi-arrow-right-circle-fill"></i> In progress</span>`;
+        return `<div class="col-md-4">
+          <div class="p-2 rounded" style="background:#1e1e36;">
+            <div class="fw-medium mb-1">${k}</div>
+            <div class="small">${status}</div>
+            <div class="small text-muted">Next: ${s.nextDate || '—'}</div>
+            <div class="progress mt-1" style="height:4px;">
+              <div class="progress-bar bg-info" style="width:${pct}%"></div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+  } catch {
+    document.getElementById('backfill-state').innerHTML = `<span class="text-muted">Could not load state.</span>`;
+  }
+}
+
+function showSearch() {
+  currentView = 'search';
+  currentOpId = null;
+  setNavActive('nav-search');
+  if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('d-none');
+  renderSearch();
+  return false;
+}
+
+function renderSearch() {
+  const content = document.getElementById('content');
+  document.getElementById('mobile-title').textContent = 'Search';
+  content.innerHTML = `
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <h2 class="h4 mb-0"><i class="bi bi-search me-2"></i>Search 4D Numbers</h2>
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-8">
+        <input type="text" class="form-control" id="search-input" placeholder="Enter 4-digit numbers, e.g. 1234, 5678, 9012" style="background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-info w-100" onclick="doSearch()"><i class="bi bi-search"></i> Search</button>
+      </div>
+    </div>
+    <div id="search-results"></div>`;
+  document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+}
+
+async function doSearch() {
+  const input = document.getElementById('search-input').value.trim();
+  if (!input) return;
+  const nums = input.split(/[,\s]+/).filter(s => /^\d{4}$/.test(s));
+  if (!nums.length) {
+    document.getElementById('search-results').innerHTML = '<div class="text-muted text-center py-3">No valid 4-digit numbers found.</div>';
+    return;
+  }
+  const el = document.getElementById('search-results');
+  el.innerHTML = `<div class="text-center py-5 text-muted"><div class="spinner-border text-secondary mb-2" role="status"></div><p class="mb-0">Searching ${nums.length} number(s)...</p></div>`;
+  try {
+    const results = await api(`/api/search?numbers=${encodeURIComponent(nums.join(','))}`);
+    if (!results.length) {
+      el.innerHTML = `<div class="text-center py-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i><p class="mb-0">No matches found for the given numbers.</p></div>`;
+      return;
+    }
+    const grouped = {};
+    results.forEach(r => {
+      const key = `${r.operator_name}||${r.draw_date}`;
+      if (!grouped[key]) grouped[key] = { operator: r.operator_name, date: r.draw_date, label: r.draw_label, hits: [] };
+      grouped[key].hits.push(r);
+    });
+    el.innerHTML = `<p class="text-muted small mb-2">${results.length} match(es) for ${nums.length} number(s)</p>
+      ${Object.values(grouped).map(g => {
+        const dt = new Date(g.date);
+        const dateStr = dt.toLocaleDateString('en-MY', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+        return `<div class="card draw-card border-0 mb-2">
+          <div class="card-body py-2">
+            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+              <span class="fw-semibold">${g.operator}</span>
+              <span class="small text-muted">${dateStr}</span>
+              ${g.label ? `<span class="badge bg-info bg-opacity-10 text-info-emphasis">#${g.label}</span>` : ''}
+            </div>
+            ${g.hits.map(h => {
+              const numsStr = (h.numbers||[]).filter(n => nums.includes(n)).join(', ');
+              const amt = h.prize_amount ? `${parseFloat(h.prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}` : '';
+              return `<div class="row g-1 tier-row align-items-center py-1 px-2 rounded">
+                <div class="col-4 col-sm-3"><small class="text-muted">${h.game_name}</small></div>
+                <div class="col-3 col-sm-4"><small class="num-cell fw-medium">${numsStr}</small></div>
+                <div class="col-3 col-sm-3"><small>${h.prize_tier}</small></div>
+                <div class="col-2 col-sm-2 text-end"><small class="${h.prize_amount ? 'text-warning-emphasis fw-medium' : 'text-muted'}">${amt}</small></div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }).join('')}`;
+  } catch (e) {
+    el.innerHTML = `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Search failed</p><small>${e.message}</small></div>`;
+  }
+}
+
 async function loadOperators() {
   operators = await api('/api/operators');
   const nav = document.getElementById('operator-list');
   nav.innerHTML = operators.map(o =>
-    `<a class="nav-link py-2 px-3" href="#" data-id="${o.id}" onclick="return selectOperator(${o.id})">
+    `<a class="nav-link py-2 px-3 ps-4" href="#" data-id="${o.id}" onclick="return selectOperator(${o.id})" id="nav-op-${o.id}">
       <i class="bi bi-building me-2"></i>${o.name}
       <span class="badge bg-secondary rounded-pill float-end">${o.draw_count}</span>
     </a>`
   ).join('');
-  if (operators.length) selectOperator(operators[0].id);
+  showDashboard();
+}
+
+async function loadDraws(id, from, to) {
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  const qs = params.toString();
+  const url = `/api/operators/${id}/draws${qs ? '?' + qs : ''}`;
+  const el = document.getElementById('draws');
+  showLoading(el);
+  try {
+    const draws = await api(url);
+    renderDraws(draws);
+  } catch (e) {
+    el.innerHTML =
+      `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Failed to load draws</p><small>${e.message}</small></div>`;
+  }
 }
 
 async function selectOperator(id) {
   currentOpId = id;
-  document.querySelectorAll('#operator-list .nav-link').forEach(l => {
-    l.classList.toggle('active', parseInt(l.dataset.id) === id);
-  });
+  currentView = 'operator';
+  setNavActive('nav-op-' + id);
   const op = operators.find(o => o.id === id);
   const content = document.getElementById('content');
   document.getElementById('mobile-title').textContent = op.name;
@@ -103,16 +382,32 @@ async function selectOperator(id) {
       <h2 class="h4 mb-0">${op.name}</h2>
       <a href="${op.website_url}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Visit website"><i class="bi bi-box-arrow-up-right"></i></a>
     </div>
+    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+      <div><input type="text" class="form-control form-control-sm" style="width:220px;background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" id="date-range" placeholder="Select date range..."></div>
+      <button class="btn btn-sm btn-outline-secondary" onclick="clearDateFilter()"><i class="bi bi-x"></i> Clear</button>
+    </div>
     <div id="draws"></div>`;
-  showLoading(document.getElementById('draws'));
-  try {
-    const draws = await api(`/api/operators/${id}/draws`);
-    renderDraws(draws);
-  } catch (e) {
-    document.getElementById('draws').innerHTML =
-      `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Failed to load draws</p><small>${e.message}</small></div>`;
-  }
+  flatpickr("#date-range", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    maxDate: "today",
+    defaultDate: ["today", "today"],
+    onChange: function(selectedDates) {
+      if (selectedDates.length === 2) {
+        const from = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+        const to = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+        loadDraws(id, from, to);
+      }
+    }
+  });
+  loadDraws(id);
   return false;
+}
+
+function clearDateFilter() {
+  const fp = document.getElementById('date-range')?._flatpickr;
+  if (fp) fp.clear();
+  loadDraws(currentOpId);
 }
 
 function renderDraws(draws) {
@@ -158,8 +453,8 @@ function quickGlance(games) {
   const jp1 = games.find(x => /jackpot\s*1/i.test(x.game_name) && x.results[0]?.prize_amount);
   const jp2 = games.find(x => /jackpot\s*2/i.test(x.game_name) && x.results[0]?.prize_amount);
   let html = `<span class="num-cell fw-medium">${top3.join(' &nbsp;|&nbsp; ')}</span>`;
-  if (jp1) html += ` &nbsp;·&nbsp; <span class="text-warning-emphasis fw-medium"><i class="bi bi-trophy-fill"></i> JP1 RM ${parseFloat(jp1.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>`;
-  if (jp2) html += ` &nbsp;·&nbsp; <span class="text-warning-emphasis fw-medium">JP2 RM ${parseFloat(jp2.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>`;
+  if (jp1) html += ` &nbsp;·&nbsp; <span class="text-warning-emphasis fw-medium"><i class="bi bi-trophy-fill"></i> ${parseFloat(jp1.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>`;
+  if (jp2) html += ` &nbsp;·&nbsp; <span class="text-warning-emphasis fw-medium"><i class="bi bi-trophy-fill text-secondary"></i> ${parseFloat(jp2.results[0].prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</span>`;
   return html;
 }
 
@@ -169,7 +464,7 @@ function renderGames(games) {
     const isJp = /jackpot/i.test(g.game_name);
     const tiers = g.results.map(r => {
       const nums = (r.numbers || []).join(' <span class="text-muted mx-1">·</span> ');
-      const amt = r.prize_amount ? `RM ${parseFloat(r.prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}` : '';
+      const amt = r.prize_amount ? `${parseFloat(r.prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}` : '';
       const isJpTier = /jackpot/i.test(r.prize_tier);
       return `<div class="row g-1 tier-row align-items-center py-1 px-2 rounded ${isJpTier ? 'jp-badge' : ''}">
         <div class="col-12 col-sm-4 col-md-3"><small class="fw-medium">${r.prize_tier}</small></div>
