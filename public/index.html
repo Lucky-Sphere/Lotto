@@ -347,7 +347,6 @@ async function loadOperators() {
   nav.innerHTML = operators.map(o =>
     `<a class="nav-link py-2 px-3 ps-4" href="#" data-id="${o.id}" onclick="return selectOperator(${o.id})" id="nav-op-${o.id}">
       <i class="bi bi-building me-2"></i>${o.name}
-      <span class="badge bg-secondary rounded-pill float-end">${o.draw_count}</span>
     </a>`
   ).join('');
   showDashboard();
