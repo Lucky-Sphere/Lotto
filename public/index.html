@@ -136,12 +136,13 @@ async function renderDashboard() {
         ${data.operators.filter(op => op.highestJp).map(op => {
           const jp = op.highestJp;
           const amt = parseFloat(jp.prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2});
-          const dateStr = new Date(jp.draw_date).toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' });
+          const dateStr = new Date(jp.draw_date).toLocaleDateString('en-MY', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
           return `<div class="col-md-4">
             <div class="card draw-card border-0 p-3">
               <div class="small text-muted mb-1">${op.name}</div>
               <div class="fs-4 fw-bold text-warning-emphasis">${amt}</div>
-              <div class="small text-muted">${jp.game_name} · ${dateStr} · #${jp.draw_label}</div>
+              <div class="fs-5 fw-medium">${dateStr}</div>
+              <div class="small text-muted">${jp.game_name} · #${jp.draw_label}</div>
             </div>
           </div>`;
         }).join('')}
