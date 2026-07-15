@@ -6,6 +6,7 @@ const db = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/api/settings', (req, res) => {
@@ -177,6 +178,38 @@ app.get('/api/draws/:id', async (req, res) => {
     `, [req.params.id]);
     draw.games = games;
     res.json(draw);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/favorites', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM favorites ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/favorites', async (req, res) => {
+  try {
+    const { numbers } = req.body;
+    if (!numbers || !numbers.length) return res.status(400).json({ error: 'numbers required' });
+    const { rows } = await db.query(
+      'INSERT INTO favorites (numbers) VALUES ($1) RETURNING *',
+      [numbers]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/favorites/:id', async (req, res) => {
+  try {
+    await db.query('DELETE FROM favorites WHERE id = $1', [req.params.id]);
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

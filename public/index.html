@@ -174,10 +174,37 @@ async function renderDashboard() {
             </div>
           </div>`;
         }).join('')}
+      </div>
+      <div class="mt-4">
+        <h5 class="text-muted fw-semibold mb-2"><i class="bi bi-heart-fill text-warning me-2"></i>Saved Numbers</h5>
+        <div id="dashboard-favorites"></div>
       </div>`;
+    loadDashboardFavorites();
   } catch (e) {
     document.getElementById('dashboard-content').innerHTML =
       `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Failed to load dashboard</p><small>${e.message}</small></div>`;
+  }
+}
+
+async function loadDashboardFavorites() {
+  const el = document.getElementById('dashboard-favorites');
+  if (!el) return;
+  try {
+    const favs = await api('/api/favorites');
+    if (!favs.length) {
+      el.innerHTML = `<div class="text-muted small">No saved numbers yet.</div>`;
+      return;
+    }
+    el.innerHTML = `<div class="row g-2">${favs.map(f => {
+      const nums = (f.numbers || []).join(', ');
+      return `<div class="col-auto">
+        <div class="card draw-card border-0 px-3 py-2" style="cursor:pointer" onclick="return selectOperator(0); showSearch(); setTimeout(() => searchFavorite(${JSON.stringify(f.numbers).replace(/"/g, '&quot;')}), 100);">
+          <span class="num-cell fw-medium">${nums}</span>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  } catch {
+    el.innerHTML = '';
   }
 }
 
@@ -303,8 +330,13 @@ function renderSearch() {
         <button class="btn btn-info w-100" onclick="doSearch()"><i class="bi bi-search"></i> Search</button>
       </div>
     </div>
-    <div id="search-results"></div>`;
+    <div id="search-results"></div>
+    <div class="mt-4">
+      <h5 class="text-muted fw-semibold mb-2"><i class="bi bi-heart-fill text-warning me-2"></i>Saved Numbers</h5>
+      <div id="favorites-list"></div>
+    </div>`;
   document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  loadFavorites();
 }
 
 async function doSearch() {
@@ -330,6 +362,7 @@ async function doSearch() {
       grouped[key].hits.push(r);
     });
     el.innerHTML = `<p class="text-muted small mb-2">${results.length} match(es) for ${nums.length} number(s)</p>
+      <button class="btn btn-sm btn-outline-warning mb-2" onclick="saveFavorite(${JSON.stringify(nums).replace(/"/g, '&quot;')})"><i class="bi bi-heart me-1"></i>Save to Favorites</button>
       ${Object.values(grouped).map(g => {
         const dt = new Date(g.date);
         const dateStr = dt.toLocaleDateString('en-MY', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
@@ -348,21 +381,7 @@ async function doSearch() {
                 <div class="col-3 col-sm-4"><small class="num-cell fw-medium">${numsStr}</small></div>
                 <div class="col-3 col-sm-3"><small>${h.prize_tier}</small></div>
                 <div class="col-2 col-sm-2 text-end"><small class="${h.prize_amount ? 'text-warning-emphasis fw-medium' : 'text-muted'}">${amt}</small></div>
-      </div>
-      <div class="row g-3 mt-2">
-        ${data.operators.filter(op => op.highestJp).map(op => {
-          const jp = op.highestJp;
-          const amt = parseFloat(jp.prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2});
-          const dateStr = new Date(jp.draw_date).toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' });
-          return `<div class="col-md-4">
-            <div class="card draw-card border-0 p-3">
-              <div class="small text-muted mb-1"><i class="bi bi-trophy-fill text-warning me-1"></i>${op.name}</div>
-              <div class="fs-4 fw-bold text-warning-emphasis">${amt}</div>
-              <div class="small text-muted">${jp.game_name} · ${dateStr} · #${jp.draw_label}</div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>`;
+              </div>`;
             }).join('')}
           </div>
         </div>`;
@@ -370,6 +389,46 @@ async function doSearch() {
   } catch (e) {
     el.innerHTML = `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Search failed</p><small>${e.message}</small></div>`;
   }
+}
+
+async function saveFavorite(nums) {
+  await fetch('/api/favorites', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ numbers: nums })
+  });
+  loadFavorites();
+}
+
+async function deleteFavorite(id) {
+  await fetch(`/api/favorites/${id}`, { method: 'DELETE' });
+  loadFavorites();
+}
+
+async function loadFavorites() {
+  const el = document.getElementById('favorites-list');
+  if (!el) return;
+  try {
+    const favs = await api('/api/favorites');
+    if (!favs.length) {
+      el.innerHTML = `<div class="text-muted small">No saved numbers yet.</div>`;
+      return;
+    }
+    el.innerHTML = favs.map(f => {
+      const nums = (f.numbers || []).join(', ');
+      return `<div class="d-flex align-items-center justify-content-between py-1 border-bottom border-secondary">
+        <span class="num-cell fw-medium">${nums}</span>
+        <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteFavorite(${f.id})"><i class="bi bi-trash"></i></button>
+      </div>`;
+    }).join('');
+  } catch {
+    el.innerHTML = `<div class="text-muted small">Failed to load favorites.</div>`;
+  }
+}
+
+async function searchFavorite(nums) {
+  document.getElementById('search-input').value = nums.join(', ');
+  doSearch();
 }
 
 async function loadOperators() {

@@ -36,3 +36,9 @@ INSERT INTO operators (name, website_url) VALUES
     ('Magnum 4D', 'https://www.magnum4d.my'),
     ('Da Ma Cai', 'https://www.damacai.com.my')
 ON CONFLICT (name) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS favorites (
+    id SERIAL PRIMARY KEY,
+    numbers TEXT[] NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
