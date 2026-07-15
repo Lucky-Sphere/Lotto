@@ -282,6 +282,69 @@ app.post('/api/import/csv', express.text({ type: 'text/csv', limit: '10mb' }), a
   }
 });
 
+const historyScrapers = {
+  sportstoto: require('./scrapers/sportstoto_history'),
+  magnum4d: require('./scrapers/magnum4d_history'),
+  damacai: require('./scrapers/damacai_history'),
+};
+const puppeteer = require('puppeteer');
+const config = require('./config');
+const { saveScrapedResult } = require('./storage');
+
+app.get('/api/sync', async (req, res) => {
+  const { from, to } = req.query;
+  if (!from || !to) return res.status(400).json({ error: 'from and to required' });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const send = (event, data) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+
+  const siteKeys = Object.keys(config.sites).filter(k => config.sites[k].enabled && historyScrapers[k]);
+  const startDate = new Date(from + 'T00:00:00Z');
+  const endDate = new Date(to + 'T00:00:00Z');
+  let totalSaved = 0;
+  let totalSkipped = 0;
+
+  for (const key of siteKeys) {
+    let browser;
+    try {
+      browser = await puppeteer.launch(config.puppeteer);
+      const page = await browser.newPage();
+      await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
+
+      const d = new Date(startDate);
+      while (d <= endDate) {
+        const dateStr = d.toISOString().split('T')[0];
+        send('progress', { operator: key, date: dateStr });
+        try {
+          const result = await historyScrapers[key].scrape(page, dateStr);
+          if (result && result.drawDate) {
+            await saveScrapedResult(result);
+            totalSaved++;
+            send('saved', { operator: key, date: dateStr, label: result.drawLabel });
+          } else {
+            totalSkipped++;
+          }
+        } catch (e) {
+          totalSkipped++;
+          send('error', { operator: key, date: dateStr, error: e.message });
+        }
+        d.setUTCDate(d.getUTCDate() + 1);
+      }
+    } catch (e) {
+      send('error', { operator: key, error: e.message });
+    } finally {
+      if (browser) await browser.close();
+    }
+  }
+
+  send('done', { saved: totalSaved, skipped: totalSkipped });
+  res.end();
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

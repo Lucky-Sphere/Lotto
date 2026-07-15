@@ -48,6 +48,9 @@
         </a>
         <div class="nav-sub-header mt-2 mb-1 px-3"><small class="text-secondary text-uppercase fw-semibold" style="font-size:11px;letter-spacing:1px;">Operators</small></div>
         <div id="operator-list"></div>
+        <a class="nav-link py-2 px-3" href="#" onclick="return showSync()" id="nav-sync">
+          <i class="bi bi-arrow-repeat me-2"></i>Sync
+        </a>
         <a class="nav-link py-2 px-3" href="#" onclick="return showSearch()" id="nav-search">
           <i class="bi bi-search me-2"></i>Search
         </a>
@@ -332,6 +335,89 @@ logs/backfill.log</pre>
   } catch {
     document.getElementById('backfill-state').innerHTML = `<span class="text-muted">Could not load state.</span>`;
   }
+}
+
+function showSync() {
+  currentView = 'sync';
+  currentOpId = null;
+  setNavActive('nav-sync');
+  if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('d-none');
+  renderSync();
+  return false;
+}
+
+function renderSync() {
+  const content = document.getElementById('content');
+  document.getElementById('mobile-title').textContent = 'Sync';
+  content.innerHTML = `
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <h2 class="h4 mb-0"><i class="bi bi-arrow-repeat me-2"></i>Sync History</h2>
+    </div>
+    <div class="card draw-card border-0 mb-3">
+      <div class="card-body">
+        <p class="small text-muted mb-3">Scrape all operators for a date range. Each date is tried — only draw dates are saved.</p>
+        <div class="row g-2 align-items-end">
+          <div class="col-auto">
+            <label class="form-label small text-muted">From</label>
+            <input type="text" class="form-control form-control-sm" id="sync-from" style="width:160px;background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" placeholder="Select start...">
+          </div>
+          <div class="col-auto">
+            <label class="form-label small text-muted">To</label>
+            <input type="text" class="form-control form-control-sm" id="sync-to" style="width:160px;background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" placeholder="Select end...">
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-sm btn-info" id="sync-btn" onclick="startSync()"><i class="bi bi-play-fill me-1"></i>Start Sync</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="sync-log" class="small" style="background:#1e1e36;border-radius:6px;padding:12px;max-height:400px;overflow-y:auto;font-family:monospace;color:#a8c8e8;">
+      <div class="text-muted">Select a date range and click Start Sync.</div>
+    </div>`;
+  flatpickr("#sync-from", { dateFormat: "Y-m-d", maxDate: "today" });
+  flatpickr("#sync-to", { dateFormat: "Y-m-d", maxDate: "today" });
+}
+
+function startSync() {
+  const from = document.getElementById('sync-from').value;
+  const to = document.getElementById('sync-to').value;
+  if (!from || !to) return;
+  const btn = document.getElementById('sync-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Syncing...';
+  const log = document.getElementById('sync-log');
+  log.innerHTML = '';
+
+  const es = new EventSource(`/api/sync?from=${from}&to=${to}`);
+  es.addEventListener('progress', e => {
+    const d = JSON.parse(e.data);
+    log.innerHTML += `<div><span class="text-muted">${d.date}</span> ${d.operator}...</div>`;
+    log.scrollTop = log.scrollHeight;
+  });
+  es.addEventListener('saved', e => {
+    const d = JSON.parse(e.data);
+    log.innerHTML += `<div class="text-success">+ ${d.operator} ${d.date} #${d.label}</div>`;
+    log.scrollTop = log.scrollHeight;
+  });
+  es.addEventListener('error', e => {
+    const d = JSON.parse(e.data);
+    log.innerHTML += `<div class="text-danger">! ${d.operator || ''} ${d.date || ''} ${d.error || ''}</div>`;
+    log.scrollTop = log.scrollHeight;
+  });
+  es.addEventListener('done', e => {
+    const d = JSON.parse(e.data);
+    log.innerHTML += `<div class="text-warning mt-2 fw-bold">Done — ${d.saved} saved, ${d.skipped} skipped</div>`;
+    log.scrollTop = log.scrollHeight;
+    es.close();
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-play-fill me-1"></i>Start Sync';
+  });
+  es.onerror = () => {
+    log.innerHTML += `<div class="text-danger">Connection lost.</div>`;
+    es.close();
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-play-fill me-1"></i>Start Sync';
+  };
 }
 
 function showSearch() {
