@@ -146,7 +146,7 @@ async function renderDashboard() {
           </div>`;
         }).join('')}
       </div>
-      <div class="row g-3" id="op-cards">
+      <div class="row g-3 mt-4 mb-2" id="op-cards">
         <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-clock-history me-2"></i>Latest Draws</h5></div>
         ${data.operators.map(op => {
           const g = op.latestDraw && (op.latestDraw.games || []).find(x => /4d|1\+3d/i.test(x.game_name) && !/jackpot/i.test(x.game_name));
