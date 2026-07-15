@@ -358,12 +358,8 @@ function renderSync() {
         <p class="small text-muted mb-3">Scrape all operators for a date range. Each date is tried — only draw dates are saved.</p>
         <div class="row g-2 align-items-end">
           <div class="col-auto">
-            <label class="form-label small text-muted">From</label>
-            <input type="text" class="form-control form-control-sm" id="sync-from" style="width:160px;background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" placeholder="Select start...">
-          </div>
-          <div class="col-auto">
-            <label class="form-label small text-muted">To</label>
-            <input type="text" class="form-control form-control-sm" id="sync-to" style="width:160px;background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" placeholder="Select end...">
+            <label class="form-label small text-muted">Date Range</label>
+            <input type="text" class="form-control form-control-sm" id="sync-range" style="width:280px;background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" placeholder="Select range...">
           </div>
           <div class="col-auto">
             <button class="btn btn-sm btn-info" id="sync-btn" onclick="startSync()"><i class="bi bi-play-fill me-1"></i>Start Sync</button>
@@ -374,14 +370,13 @@ function renderSync() {
     <div id="sync-log" class="small" style="background:#1e1e36;border-radius:6px;padding:12px;max-height:400px;overflow-y:auto;font-family:monospace;color:#a8c8e8;">
       <div class="text-muted">Select a date range and click Start Sync.</div>
     </div>`;
-  flatpickr("#sync-from", { dateFormat: "Y-m-d", maxDate: "today" });
-  flatpickr("#sync-to", { dateFormat: "Y-m-d", maxDate: "today" });
+  flatpickr("#sync-range", { mode: "range", dateFormat: "Y-m-d", maxDate: "today" });
 }
 
 function startSync() {
-  const from = document.getElementById('sync-from').value;
-  const to = document.getElementById('sync-to').value;
-  if (!from || !to) return;
+  const val = document.getElementById('sync-range').value;
+  if (!val || !val.includes(' to ')) return;
+  const [from, to] = val.split(' to ');
   const btn = document.getElementById('sync-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Syncing...';
