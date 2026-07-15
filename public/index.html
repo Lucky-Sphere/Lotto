@@ -247,8 +247,8 @@ async function renderSettings() {
               <i class="bi bi-clock fs-4 text-warning"></i>
               <h5 class="card-title mb-0">Midnight Scrape</h5>
             </div>
-            <p class="small text-muted mb-0">Fetches the latest results from all 3 operators every night at midnight.</p>
-            <pre class="small mt-2 mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;overflow-x:auto;user-select:all;">0 0 * * * cd /var/www/html/lotto && bash cron_midnight.sh</pre>
+            <p class="small text-muted mb-2">Fetches latest results from all 3 operators daily at midnight.</p>
+            <pre class="small mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;overflow-x:auto;user-select:all;">0 0 * * *</pre>
           </div>
         </div>
       </div>
@@ -259,8 +259,8 @@ async function renderSettings() {
               <i class="bi bi-arrow-repeat fs-4 text-info"></i>
               <h5 class="card-title mb-0">Historical Backfill</h5>
             </div>
-            <p class="small text-muted mb-0">Every 30 minutes, goes back <strong>1 day</strong> further into history per operator until <strong>1960</strong>.</p>
-            <pre class="small mt-2 mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;overflow-x:auto;user-select:all;">*/30 * * * * cd /var/www/html/lotto && bash cron_backfill.sh</pre>
+            <p class="small text-muted mb-2">Every 15 minutes, goes back 1 day further per operator until 1960.</p>
+            <pre class="small mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;overflow-x:auto;user-select:all;">*/15 * * * *</pre>
           </div>
         </div>
       </div>
@@ -271,31 +271,7 @@ async function renderSettings() {
               <i class="bi bi-activity fs-4 text-success"></i>
               <h5 class="card-title mb-0">Backfill Progress</h5>
             </div>
-            <div id="backfill-state" class="small text-muted py-3 text-center">Loading...</div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card draw-card border-0">
-          <div class="card-body">
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-info-circle fs-4 text-secondary"></i>
-              <h5 class="card-title mb-0">State File</h5>
-            </div>
-            <p class="small text-muted mb-0">Progress is tracked in <code class="text-info">backfill_state.json</code>. Each operator has its own <code>nextDate</code> and <code>complete</code> flag. Once 1960 is reached, backfill marks itself done.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card draw-card border-0">
-          <div class="card-body">
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-journal-text fs-4 text-warning"></i>
-              <h5 class="card-title mb-0">Logs</h5>
-            </div>
-            <pre class="small mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;max-height:160px;overflow-y:auto;">
-logs/midnight.log
-logs/backfill.log</pre>
+            <div id="backfill-state" class="small text-muted py-2 text-center">Loading...</div>
           </div>
         </div>
       </div>
@@ -312,6 +288,18 @@ logs/backfill.log</pre>
               <label class="btn btn-sm btn-outline-warning mb-0" style="cursor:pointer"><i class="bi bi-upload me-1"></i>Import CSV<input type="file" accept=".csv" class="d-none" onchange="importCSV(this)"></label>
             </div>
             <div id="import-status" class="small mt-2"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card draw-card border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-journal-text fs-4 text-warning"></i>
+              <h5 class="card-title mb-0">Logs</h5>
+            </div>
+            <pre class="small mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;max-height:160px;overflow-y:auto;">logs/midnight.log
+logs/backfill.log</pre>
           </div>
         </div>
       </div>
