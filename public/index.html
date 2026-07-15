@@ -138,12 +138,6 @@ async function renderDashboard() {
             const r = g.results.find(x => x.prize_tier === t);
             return r ? (r.numbers||[]).join('') : null;
           }).filter(Boolean) : [];
-          const jps = (op.latestDraw && (op.latestDraw.games||[]).filter(x => /jackpot/i.test(x.game_name))) || [];
-          let highestJp = null;
-          jps.forEach(j => {
-            const amt = j.results[0] ? parseFloat(j.results[0].prize_amount) : 0;
-            if (!highestJp || amt > highestJp.amount) highestJp = { name: j.game_name, amount: amt };
-          });
           const dt = op.latestDraw ? new Date(op.latestDraw.draw_date) : null;
           const dateStr = dt ? dt.toLocaleDateString('en-MY', { weekday:'short', year:'numeric', month:'short', day:'numeric' }) : '';
           return `<div class="col-12">
@@ -154,7 +148,7 @@ async function renderDashboard() {
               </div>
               ${op.latestDraw ? `<div class="mb-2"><span class="fw-medium fs-6">${dateStr}</span>${op.latestDraw.draw_label ? ` <span class="badge bg-info bg-opacity-10 text-info-emphasis fs-6">#${op.latestDraw.draw_label}</span>` : ''}</div>` : '<div class="text-muted mb-2">No draws yet</div>'}
               ${top3.length ? `<div class="num-cell fw-medium mb-2" style="font-size:1.4rem">${top3.join(' · ')}</div>` : ''}
-              ${highestJp ? `<div class="fs-4 fw-bold text-warning-emphasis"><i class="bi bi-trophy-fill me-1"></i>${highestJp.amount.toLocaleString('en-MY', {minimumFractionDigits:2})}</div>` : ''}
+              ${op.highestJp ? `<div class="fs-4 fw-bold text-warning-emphasis"><i class="bi bi-trophy-fill me-1"></i>${parseFloat(op.highestJp.prize_amount).toLocaleString('en-MY', {minimumFractionDigits:2})}</div><div class="small text-muted">${op.highestJp.game_name} · ${new Date(op.highestJp.draw_date).toLocaleDateString('en-MY', {year:'numeric',month:'short',day:'numeric'})}</div>` : ''}
             </div>
           </div>`;
         }).join('')}

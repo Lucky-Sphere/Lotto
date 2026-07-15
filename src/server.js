@@ -60,6 +60,15 @@ app.get('/api/dashboard', async (req, res) => {
           op.latestDraw.games = games;
         }
       }
+      const { rows: jpRows } = await db.query(`
+        SELECT dr.prize_amount, d.draw_date, d.draw_label, g.name AS game_name
+        FROM draw_results dr
+        JOIN draws d ON d.id = dr.draw_id
+        JOIN games g ON g.id = dr.game_id
+        WHERE d.operator_id = $1 AND dr.prize_amount IS NOT NULL AND g.name ~* 'jackpot'
+        ORDER BY dr.prize_amount DESC LIMIT 1
+      `, [op.id]);
+      op.highestJp = jpRows[0] || null;
     }
     const { rows: [{ total }] } = await db.query(`SELECT COUNT(*) AS total FROM draws`);
     res.json({ totalDraws: parseInt(total), operators });
