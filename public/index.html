@@ -332,10 +332,21 @@ function renderSearch() {
     </div>
     <div id="search-results"></div>
     <div class="mt-4">
-      <h5 class="text-muted fw-semibold mb-2"><i class="bi bi-heart-fill text-warning me-2"></i>Saved Numbers</h5>
-      <div id="favorites-list"></div>
+      <div class="card draw-card border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="mb-0 fw-semibold"><i class="bi bi-heart-fill text-warning me-2"></i>Manage Favorites</h5>
+          </div>
+          <div class="d-flex gap-2 mb-3">
+            <input type="text" class="form-control form-control-sm" id="fav-input" placeholder="Add numbers, e.g. 1234, 5678" style="background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;">
+            <button class="btn btn-sm btn-warning" onclick="addFavoriteFromInput()"><i class="bi bi-plus-lg"></i> Add</button>
+          </div>
+          <div id="favorites-list"></div>
+        </div>
+      </div>
     </div>`;
   document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  document.getElementById('fav-input').addEventListener('keydown', e => { if (e.key === 'Enter') addFavoriteFromInput(); });
   loadFavorites();
 }
 
@@ -405,24 +416,67 @@ async function deleteFavorite(id) {
   loadFavorites();
 }
 
+async function editFavorite(id) {
+  const row = document.getElementById('fav-row-' + id);
+  if (!row) return;
+  const current = row.querySelector('.fav-nums').textContent.trim();
+  row.innerHTML = `
+    <input type="text" class="form-control form-control-sm flex-grow-1" value="${current}" id="fav-edit-${id}" style="background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" onkeydown="if(event.key==='Enter')saveEditFavorite(${id})">
+    <button class="btn btn-sm btn-outline-success" onclick="saveEditFavorite(${id})"><i class="bi bi-check-lg"></i></button>
+    <button class="btn btn-sm btn-outline-secondary" onclick="loadFavorites()"><i class="bi bi-x-lg"></i></button>`;
+  document.getElementById('fav-edit-' + id).focus();
+}
+
+async function saveEditFavorite(id) {
+  const val = document.getElementById('fav-edit-' + id).value.trim();
+  const nums = val.split(/[,\s]+/).filter(s => /^\d{4}$/.test(s));
+  if (!nums.length) return;
+  await fetch(`/api/favorites/${id}`, {
+    method: 'DELETE'
+  });
+  await fetch('/api/favorites', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ numbers: nums })
+  });
+  loadFavorites();
+}
+
+async function addFavoriteFromInput() {
+  const input = document.getElementById('fav-input');
+  const val = input.value.trim();
+  if (!val) return;
+  const nums = val.split(/[,\s]+/).filter(s => /^\d{4}$/.test(s));
+  if (!nums.length) return;
+  await fetch('/api/favorites', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ numbers: nums })
+  });
+  input.value = '';
+  loadFavorites();
+}
+
 async function loadFavorites() {
   const el = document.getElementById('favorites-list');
   if (!el) return;
   try {
     const favs = await api('/api/favorites');
     if (!favs.length) {
-      el.innerHTML = `<div class="text-muted small">No saved numbers yet.</div>`;
+      el.innerHTML = `<div class="text-muted small text-center py-2">No saved numbers yet.</div>`;
       return;
     }
     el.innerHTML = favs.map(f => {
       const nums = (f.numbers || []).join(', ');
-      return `<div class="d-flex align-items-center justify-content-between py-1 border-bottom border-secondary">
-        <span class="num-cell fw-medium">${nums}</span>
-        <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteFavorite(${f.id})"><i class="bi bi-trash"></i></button>
+      return `<div class="d-flex align-items-center gap-2 py-2 border-bottom border-secondary" id="fav-row-${f.id}">
+        <span class="num-cell fw-medium flex-grow-1 fav-nums">${nums}</span>
+        <button class="btn btn-sm btn-outline-info" onclick="searchFavorite(${JSON.stringify(f.numbers).replace(/"/g, '&quot;')})"><i class="bi bi-search"></i></button>
+        <button class="btn btn-sm btn-outline-warning" onclick="editFavorite(${f.id})"><i class="bi bi-pencil"></i></button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteFavorite(${f.id})"><i class="bi bi-trash"></i></button>
       </div>`;
     }).join('');
   } catch {
-    el.innerHTML = `<div class="text-muted small">Failed to load favorites.</div>`;
+    el.innerHTML = `<div class="text-muted small text-center py-2">Failed to load favorites.</div>`;
   }
 }
 
