@@ -186,6 +186,30 @@ async function renderDashboard() {
   }
 }
 
+async function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const el = document.getElementById('import-status');
+  el.innerHTML = `<span class="text-info">Importing...</span>`;
+  try {
+    const text = await file.text();
+    const resp = await fetch('/api/import/csv', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/csv' },
+      body: text
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      el.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Imported ${data.imported} row(s)</span>`;
+    } else {
+      el.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle-fill me-1"></i>${data.error}</span>`;
+    }
+  } catch (e) {
+    el.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle-fill me-1"></i>${e.message}</span>`;
+  }
+  input.value = '';
+}
+
 async function loadDashboardFavorites() {
   const el = document.getElementById('dashboard-favorites');
   if (!el) return;
@@ -272,6 +296,22 @@ async function renderSettings() {
             <pre class="small mb-0 p-2 rounded" style="background:#1e1e36;color:#a8c8e8;max-height:160px;overflow-y:auto;">
 logs/midnight.log
 logs/backfill.log</pre>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card draw-card border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-download fs-4 text-info"></i>
+              <h5 class="card-title mb-0">Export / Import</h5>
+            </div>
+            <p class="small text-muted mb-3">Export all draw results to CSV, or import from a CSV file.</p>
+            <div class="d-flex gap-2 mb-2">
+              <a href="/api/export/csv" class="btn btn-sm btn-outline-info" download><i class="bi bi-download me-1"></i>Export CSV</a>
+              <label class="btn btn-sm btn-outline-warning mb-0" style="cursor:pointer"><i class="bi bi-upload me-1"></i>Import CSV<input type="file" accept=".csv" class="d-none" onchange="importCSV(this)"></label>
+            </div>
+            <div id="import-status" class="small mt-2"></div>
           </div>
         </div>
       </div>

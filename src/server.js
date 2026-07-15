@@ -215,6 +215,73 @@ app.delete('/api/favorites/:id', async (req, res) => {
   }
 });
 
+app.get('/api/export/csv', async (req, res) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT o.name AS operator, d.draw_date, d.draw_label,
+             g.name AS game, dr.prize_tier, dr.numbers, dr.prize_amount
+      FROM draw_results dr
+      JOIN draws d ON d.id = dr.draw_id
+      JOIN operators o ON o.id = d.operator_id
+      JOIN games g ON g.id = dr.game_id
+      ORDER BY o.name, d.draw_date DESC, g.name, dr.id
+    `);
+    const header = 'operator,draw_date,draw_label,game,prize_tier,numbers,prize_amount\n';
+    const csv = rows.map(r => {
+      const nums = (r.numbers || []).join(';');
+      const amt = r.prize_amount || '';
+      return `${r.operator},${r.draw_date.toISOString().split('T')[0]},${r.draw_label},${r.game},${r.prize_tier},"${nums}",${amt}`;
+    }).join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=lotto_export.csv');
+    res.send(header + csv);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/import/csv', express.text({ type: 'text/csv', limit: '10mb' }), async (req, res) => {
+  try {
+    const lines = req.body.trim().split('\n');
+    if (lines.length < 2) return res.status(400).json({ error: 'No data rows' });
+    const header = lines[0].split(',');
+    const opIdx = header.indexOf('operator');
+    const dateIdx = header.indexOf('draw_date');
+    const labelIdx = header.indexOf('draw_label');
+    const gameIdx = header.indexOf('game');
+    const tierIdx = header.indexOf('prize_tier');
+    const numsIdx = header.indexOf('numbers');
+    const amtIdx = header.indexOf('prize_amount');
+    if (opIdx < 0) return res.status(400).json({ error: 'Missing operator column' });
+
+    let imported = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line.trim()) continue;
+      const match = line.match(/^([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),"([^"]*)",([^\n]*)$/);
+      if (!match) continue;
+      const [, op, dateStr, label, game, tier, nums, amt] = match;
+      const operatorId = await db.getOperatorId(op.trim());
+      if (!operatorId) continue;
+      const drawDate = new Date(dateStr.trim());
+      if (isNaN(drawDate.getTime())) continue;
+      const drawId = await db.upsertDraw(operatorId, drawDate, label.trim() || null);
+      const gameId = await db.upsertGame(operatorId, game.trim());
+      const numbers = nums.split(';').filter(Boolean);
+      const prizeAmount = amt ? parseFloat(amt) : null;
+      await db.query(
+        'DELETE FROM draw_results WHERE draw_id = $1 AND game_id = $2 AND prize_tier = $3',
+        [drawId, gameId, tier.trim()]
+      );
+      await db.insertDrawResult(drawId, gameId, tier.trim(), numbers, prizeAmount);
+      imported++;
+    }
+    res.json({ ok: true, imported });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
