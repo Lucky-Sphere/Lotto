@@ -347,7 +347,21 @@ function renderSearch() {
     <div id="search-results" class="mt-4"></div>`;
   document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
   document.getElementById('fav-input').addEventListener('keydown', e => { if (e.key === 'Enter') addFavoriteFromInput(); });
-  loadFavorites();
+  loadFavorites().then(() => autoSearchFavorites());
+}
+
+async function autoSearchFavorites() {
+  try {
+    const favs = await api('/api/favorites');
+    if (favs.length) {
+      const allNums = [...new Set(favs.flatMap(f => f.numbers || []))];
+      if (allNums.length) {
+        document.getElementById('search-input').value = allNums.join(', ');
+        doSearch();
+      }
+    }
+  } catch {}
+}
 }
 
 async function doSearch() {
@@ -417,13 +431,18 @@ async function deleteFavorite(id) {
 }
 
 async function editFavorite(id) {
-  const row = document.getElementById('fav-row-' + id);
+  const favs = await api('/api/favorites');
+  const f = favs.find(x => x.id === id);
+  if (!f) return;
+  const current = (f.numbers || []).join(', ');
+  const row = document.querySelector(`[data-fav-id="${id}"]`);
   if (!row) return;
-  const current = row.querySelector('.fav-nums').textContent.trim();
-  row.innerHTML = `
-    <input type="text" class="form-control form-control-sm flex-grow-1" value="${current}" id="fav-edit-${id}" style="background:#1e1e36;border:1px solid #2a2a48;color:#cfd8e3;" onkeydown="if(event.key==='Enter')saveEditFavorite(${id})">
-    <button class="btn btn-sm btn-outline-success" onclick="saveEditFavorite(${id})"><i class="bi bi-check-lg"></i></button>
-    <button class="btn btn-sm btn-outline-secondary" onclick="loadFavorites()"><i class="bi bi-x-lg"></i></button>`;
+  row.outerHTML = `
+    <div class="d-inline-flex align-items-center gap-1 me-2 mb-2 px-2 py-1 rounded-pill" style="background:#1e1e36;border:1px solid #f5b342;" data-fav-id="${id}">
+      <input type="text" class="form-control form-control-sm" value="${current}" id="fav-edit-${id}" style="width:180px;background:#14142b;border:1px solid #2a2a48;color:#cfd8e3;font-size:13px;" onkeydown="if(event.key==='Enter')saveEditFavorite(${id})">
+      <button class="btn btn-sm p-0 text-success" onclick="saveEditFavorite(${id})" title="Save"><i class="bi bi-check-lg" style="font-size:14px"></i></button>
+      <button class="btn btn-sm p-0 text-secondary" onclick="loadFavorites()" title="Cancel"><i class="bi bi-x-lg" style="font-size:14px"></i></button>
+    </div>`;
   document.getElementById('fav-edit-' + id).focus();
 }
 
@@ -468,11 +487,11 @@ async function loadFavorites() {
     }
     el.innerHTML = favs.map(f => {
       const nums = (f.numbers || []).join(', ');
-      return `<div class="d-flex align-items-center gap-2 py-2 border-bottom border-secondary" id="fav-row-${f.id}">
-        <span class="num-cell fw-medium flex-grow-1 fav-nums">${nums}</span>
-        <button class="btn btn-sm btn-outline-info" onclick="searchFavorite(${JSON.stringify(f.numbers).replace(/"/g, '&quot;')})"><i class="bi bi-search"></i></button>
-        <button class="btn btn-sm btn-outline-warning" onclick="editFavorite(${f.id})"><i class="bi bi-pencil"></i></button>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteFavorite(${f.id})"><i class="bi bi-trash"></i></button>
+      return `<div class="d-inline-flex align-items-center gap-1 me-2 mb-2 px-3 py-1 rounded-pill" style="background:#1e1e36;border:1px solid #2a2a48;" data-fav-id="${f.id}">
+        <span class="num-cell fw-medium">${nums}</span>
+        <button class="btn btn-sm p-0 ms-1 text-info" onclick="searchFavorite(${JSON.stringify(f.numbers).replace(/"/g, '&quot;')})" title="Search"><i class="bi bi-search" style="font-size:12px"></i></button>
+        <button class="btn btn-sm p-0 ms-1 text-warning" onclick="editFavorite(${f.id})" title="Edit"><i class="bi bi-pencil" style="font-size:12px"></i></button>
+        <button class="btn btn-sm p-0 ms-1 text-danger" onclick="deleteFavorite(${f.id})" title="Delete"><i class="bi bi-trash" style="font-size:12px"></i></button>
       </div>`;
     }).join('');
   } catch {
