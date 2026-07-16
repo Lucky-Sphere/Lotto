@@ -76,8 +76,10 @@ app.get('/api/dashboard', async (req, res) => {
       `SELECT TO_CHAR(sd.draw_date, 'YYYY-MM-DD') AS draw_date, o.name AS operator_name
        FROM special_draws sd
        JOIN operators o ON o.id = sd.operator_id
-       WHERE sd.draw_date >= CURRENT_DATE
-       ORDER BY sd.draw_date`
+       WHERE sd.draw_date = (
+         SELECT MIN(draw_date) FROM special_draws WHERE draw_date >= CURRENT_DATE
+       )
+       ORDER BY o.name`
     );
     res.json({ totalDraws: parseInt(total), operators, specialDraws });
   } catch (err) {
