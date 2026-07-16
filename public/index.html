@@ -238,9 +238,10 @@ async function renderDashboard() {
       <div class="row g-3 mt-2 mb-2">
         <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-star-fill text-warning me-2"></i>Special Draws</h5></div>
         ${data.specialDraws.map(sd => {
-          const d = new Date(sd.draw_date + 'T19:00:00+08:00');
+          const datePart = sd.draw_date.split('T')[0];
+          const d = new Date(datePart + 'T19:00:00+08:00');
           const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-          const tid = 'countdown-sp-' + sd.draw_date;
+          const tid = 'countdown-sp-' + datePart;
           return `<div class="col-md-4">
             <div class="card draw-card border-0 p-3" style="border-left:3px solid #ffc107 !important;">
               <div class="d-flex justify-content-between align-items-start">
@@ -270,8 +271,8 @@ async function renderDashboard() {
       countdownTargets.push({ el, target: regTarget });
     });
     document.querySelectorAll('.draw-countdown[id^="countdown-sp-"]').forEach(el => {
-      const dateStr = el.id.replace('countdown-sp-', '');
-      countdownTargets.push({ el, target: new Date(dateStr + 'T19:00:00+08:00').getTime() });
+      const datePart = el.id.replace('countdown-sp-', '');
+      countdownTargets.push({ el, target: new Date(datePart + 'T19:00:00+08:00').getTime() });
     });
     updateCountdowns();
     drawCountdownInterval = setInterval(updateCountdowns, 1000);
