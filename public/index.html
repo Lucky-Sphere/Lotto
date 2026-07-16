@@ -200,6 +200,23 @@ async function renderDashboard() {
             </div>
           </div>`;
         }).join('')}
+      </div>
+      <div class="row g-3 mt-4 mb-2">
+        <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-calendar-event me-2"></i>Next Draws</h5></div>
+        ${getNextDraws().map(d => `<div class="col-md-4">
+          <div class="card draw-card border-0 p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold fs-6">${d.day}</div>
+                <div class="text-muted small">${d.dateStr}</div>
+              </div>
+              <div class="text-end">
+                <div class="small text-muted">7:00 PM</div>
+                <div class="badge bg-info bg-opacity-10 text-info-emphasis">All Operators</div>
+              </div>
+            </div>
+          </div>
+        </div>`).join('')}
       </div>`;
     loadDashboardFavorites();
   } catch (e) {
@@ -533,23 +550,6 @@ async function doSearch() {
                 <div class="col-3 col-sm-4"><small class="num-cell fw-medium">${numsStr}</small></div>
                 <div class="col-3 col-sm-3"><small>${h.prize_tier}</small></div>
                 <div class="col-2 col-sm-2 text-end"><small class="${h.prize_amount ? 'text-warning-emphasis fw-medium' : 'text-muted'}">${amt}</small></div>
-      </div>
-      <div class="row g-3 mt-4 mb-2">
-        <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-calendar-event me-2"></i>Next Draws</h5></div>
-        ${getNextDraws().map(d => `<div class="col-md-4">
-          <div class="card draw-card border-0 p-3">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-bold fs-6">${d.day}</div>
-                <div class="text-muted small">${d.dateStr}</div>
-              </div>
-              <div class="text-end">
-                <div class="small text-muted">10:00 PM</div>
-                <div class="badge bg-info bg-opacity-10 text-info-emphasis">All Operators</div>
-              </div>
-            </div>
-          </div>
-        </div>`).join('')}
       </div>`;
             }).join('')}
           </div>
