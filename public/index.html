@@ -103,19 +103,34 @@ function setNavActive(id) {
   if (el) el.classList.add('active');
 }
 
-function getNextDraws() {
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const drawDays = [0, 3, 6]; // Sun, Wed, Sat
+function getNextDrawDate() {
+  const drawDays = [0, 3, 6];
   const now = new Date();
   let d = new Date(now);
   d.setDate(d.getDate() + 1);
-  while (!drawDays.includes(d.getDay())) {
-    d.setDate(d.getDate() + 1);
-  }
-  return [{
-    day: dayNames[d.getDay()],
-    dateStr: d.toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' })
-  }];
+  while (!drawDays.includes(d.getDay())) d.setDate(d.getDate() + 1);
+  d.setHours(19, 0, 0, 0);
+  return d;
+}
+
+let drawCountdownInterval = null;
+function updateCountdowns() {
+  const target = getNextDrawDate();
+  const now = Date.now();
+  const diff = target - now;
+  if (diff <= 0) return;
+  const days = Math.floor(diff / 86400000);
+  const hrs = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  const parts = [];
+  if (days) parts.push(days + 'd');
+  parts.push(String(hrs).padStart(2,'0') + 'h');
+  parts.push(String(mins).padStart(2,'0') + 'm');
+  parts.push(String(secs).padStart(2,'0') + 's');
+  document.querySelectorAll('.draw-countdown').forEach(el => {
+    el.textContent = parts.join(' ');
+  });
 }
 
 function showDashboard() {
@@ -200,18 +215,18 @@ async function renderDashboard() {
         <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-calendar-event me-2"></i>Next Draws</h5></div>
         ${['Magnum 4D','Sports Toto','Da Ma Cai'].map((name, i) => {
           const colors = ['warning','info','success'];
-          const d = getNextDraws()[0];
+          const d = getNextDrawDate();
+          const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
           return `<div class="col-md-4">
             <div class="card draw-card border-0 p-3">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <div class="small text-muted mb-1">Next Draw</div>
-                  <div class="fw-bold fs-6">${d.day}</div>
-                  <div class="text-muted small">${d.dateStr}</div>
+                  <div class="fw-bold fs-6">${dayNames[d.getDay()]}</div>
+                  <div class="text-muted small">${d.toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' })}</div>
                 </div>
                 <div class="text-end">
-                  <div class="small text-muted">7:00 PM</div>
-                  <span class="badge bg-${colors[i]} bg-opacity-10 text-${colors[i]}-emphasis mt-1">${name}</span>
+                  <span class="badge bg-${colors[i]} bg-opacity-10 text-${colors[i]}-emphasis">${name}</span>
+                  <div class="draw-countdown fw-bold fs-5 text-warning-emphasis mt-1">--h --m --s</div>
                 </div>
               </div>
             </div>
@@ -219,6 +234,9 @@ async function renderDashboard() {
         }).join('')}
       </div>`;
     loadDashboardFavorites();
+    if (drawCountdownInterval) clearInterval(drawCountdownInterval);
+    updateCountdowns();
+    drawCountdownInterval = setInterval(updateCountdowns, 1000);
   } catch (e) {
     document.getElementById('dashboard-content').innerHTML =
       `<div class="text-center py-5 text-muted"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0">Failed to load dashboard</p><small>${e.message}</small></div>`;
