@@ -253,7 +253,7 @@ async function renderDashboard() {
                   <div class="text-muted small">${d.toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' })}</div>
                 </div>
                 <div class="text-end">
-                  <span class="badge bg-${colors[i]} bg-opacity-10 text-${colors[i]}-emphasis">${opShort[sd.operator_name]}</span>
+                  <span class="badge bg-${colors[i]} bg-opacity-10 text-${colors[i]}-emphasis">${sd.operator_name}</span>
                   <div class="draw-countdown fw-bold fs-5 text-warning-emphasis mt-1" id="${tid}">--h --m --s</div>
                 </div>
               </div>
