@@ -107,20 +107,15 @@ function getNextDraws() {
   const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const drawDays = [0, 3, 6]; // Sun, Wed, Sat
   const now = new Date();
-  const results = [];
   let d = new Date(now);
   d.setDate(d.getDate() + 1);
-  d.setHours(22, 0, 0, 0);
-  while (results.length < 3) {
-    if (drawDays.includes(d.getDay())) {
-      results.push({
-        day: dayNames[d.getDay()],
-        dateStr: d.toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' })
-      });
-    }
+  while (!drawDays.includes(d.getDay())) {
     d.setDate(d.getDate() + 1);
   }
-  return results;
+  return [{
+    day: dayNames[d.getDay()],
+    dateStr: d.toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' })
+  }];
 }
 
 function showDashboard() {
