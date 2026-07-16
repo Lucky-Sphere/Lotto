@@ -33,7 +33,7 @@ async function scrapeSpecialDraws() {
     const year = parseInt(m[3]);
     const imgs = m[4];
     if (mon === undefined) continue;
-    const dateStr = new Date(year, mon, day).toISOString().split('T')[0];
+    const dateStr = `${year}-${String(mon+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const operators = [];
     for (const [logo, name] of Object.entries(logoToOperator)) {
       if (new RegExp(`alt=["']${logo}["']`, 'i').test(imgs)) {
