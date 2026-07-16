@@ -42,3 +42,9 @@ CREATE TABLE IF NOT EXISTS favorites (
     numbers TEXT[] NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS special_draws (
+    id SERIAL PRIMARY KEY,
+    draw_date DATE NOT NULL UNIQUE,
+    scraped_at TIMESTAMP DEFAULT NOW()
+);

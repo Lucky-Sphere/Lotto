@@ -72,7 +72,10 @@ app.get('/api/dashboard', async (req, res) => {
       op.highestJp = jpRows[0] || null;
     }
     const { rows: [{ total }] } = await db.query(`SELECT COUNT(*) AS total FROM draws`);
-    res.json({ totalDraws: parseInt(total), operators });
+    const { rows: specialDraws } = await db.query(
+      `SELECT draw_date FROM special_draws WHERE draw_date >= CURRENT_DATE ORDER BY draw_date`
+    );
+    res.json({ totalDraws: parseInt(total), operators, specialDraws });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -343,6 +346,17 @@ app.get('/api/sync', async (req, res) => {
 
   send('done', { saved: totalSaved, skipped: totalSkipped });
   res.end();
+});
+
+const { syncSpecialDraws } = require('./scrapers/special_draws');
+
+app.post('/api/special-draws/sync', async (req, res) => {
+  try {
+    const result = await syncSpecialDraws();
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.listen(PORT, () => {
