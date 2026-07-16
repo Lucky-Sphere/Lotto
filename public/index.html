@@ -234,11 +234,18 @@ async function renderDashboard() {
           </div>`;
         }).join('')}
       </div>
-      ${data.specialDraws && data.specialDraws.length ? `
-      <div class="row g-3 mt-2 mb-2">
-        <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-star-fill text-warning me-2"></i>Special Draws</h5></div>
-        ${data.specialDraws.map(sd => {
+      ${data.specialDraws && data.specialDraws.length ? (() => {
+        const grouped = {};
+        data.specialDraws.forEach(sd => {
           const datePart = sd.draw_date.split('T')[0];
+          if (!grouped[datePart]) grouped[datePart] = [];
+          grouped[datePart].push(sd.operator_name);
+        });
+        const opColors = { 'Magnum 4D': 'warning', 'Sports Toto': 'info', 'Da Ma Cai': 'success' };
+        const opShort = { 'Magnum 4D': 'Magnum', 'Sports Toto': 'Toto', 'Da Ma Cai': 'Damacai' };
+        return `<div class="row g-3 mt-2 mb-2">
+        <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-star-fill text-warning me-2"></i>Special Draws</h5></div>
+        ${Object.entries(grouped).map(([datePart, ops]) => {
           const d = new Date(datePart + 'T19:00:00+08:00');
           const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
           const tid = 'countdown-sp-' + datePart;
@@ -251,9 +258,7 @@ async function renderDashboard() {
                 </div>
                 <div class="text-end">
                   <div class="d-flex gap-1 justify-content-end flex-wrap">
-                    <span class="badge bg-warning bg-opacity-10 text-warning-emphasis">Magnum</span>
-                    <span class="badge bg-info bg-opacity-10 text-info-emphasis">Toto</span>
-                    <span class="badge bg-success bg-opacity-10 text-success-emphasis">Damacai</span>
+                    ${ops.map(op => `<span class="badge bg-${opColors[op]} bg-opacity-10 text-${opColors[op]}-emphasis">${opShort[op]}</span>`).join('')}
                   </div>
                   <div class="draw-countdown fw-bold fs-5 text-warning-emphasis mt-1" id="${tid}">--h --m --s</div>
                 </div>
@@ -261,7 +266,8 @@ async function renderDashboard() {
             </div>
           </div>`;
         }).join('')}
-      </div>` : ''}
+      </div>`;
+      })() : ''}
       `;
     loadDashboardFavorites();
     if (drawCountdownInterval) clearInterval(drawCountdownInterval);

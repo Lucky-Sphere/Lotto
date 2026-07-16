@@ -73,7 +73,11 @@ app.get('/api/dashboard', async (req, res) => {
     }
     const { rows: [{ total }] } = await db.query(`SELECT COUNT(*) AS total FROM draws`);
     const { rows: specialDraws } = await db.query(
-      `SELECT draw_date FROM special_draws WHERE draw_date >= CURRENT_DATE ORDER BY draw_date`
+      `SELECT sd.draw_date, o.name AS operator_name
+       FROM special_draws sd
+       JOIN operators o ON o.id = sd.operator_id
+       WHERE sd.draw_date >= CURRENT_DATE
+       ORDER BY sd.draw_date`
     );
     res.json({ totalDraws: parseInt(total), operators, specialDraws });
   } catch (err) {

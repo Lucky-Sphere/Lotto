@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS favorites (
 
 CREATE TABLE IF NOT EXISTS special_draws (
     id SERIAL PRIMARY KEY,
-    draw_date DATE NOT NULL UNIQUE,
-    scraped_at TIMESTAMP DEFAULT NOW()
+    draw_date DATE NOT NULL,
+    operator_id INTEGER NOT NULL REFERENCES operators(id),
+    scraped_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(draw_date, operator_id)
 );

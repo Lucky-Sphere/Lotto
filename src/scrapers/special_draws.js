@@ -1,6 +1,12 @@
 const https = require('https');
 const { query } = require('../db');
 
+const logoToOperator = {
+  magnum: 'Magnum 4D',
+  damacai: 'Da Ma Cai',
+  toto: 'Sports Toto',
+};
+
 async function fetchPage(url) {
   return new Promise((resolve, reject) => {
     https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, res => {
@@ -17,31 +23,43 @@ async function fetchPage(url) {
 
 async function scrapeSpecialDraws() {
   const html = await fetchPage('https://gd4d.co/en/special-draws');
-  const dates = [];
-  const re = /(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})\s*\(Tue\)/gi;
+  const results = [];
+  const months = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+  const blockRe = /<h4>(\d{1,2})\s+(\w+)\s+(\d{4})\s*\(Tue\)<\/h4>([\s\S]*?)(?=<div style="margin-bottom|$)/gi;
   let m;
-  const months = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
-  while ((m = re.exec(html)) !== null) {
+  while ((m = blockRe.exec(html)) !== null) {
     const day = parseInt(m[1]);
     const mon = months[m[2]];
     const year = parseInt(m[3]);
-    const d = new Date(year, mon - 1, day);
-    dates.push(d.toISOString().split('T')[0]);
+    const imgs = m[4];
+    if (mon === undefined) continue;
+    const dateStr = new Date(year, mon, day).toISOString().split('T')[0];
+    const operators = [];
+    for (const [logo, name] of Object.entries(logoToOperator)) {
+      if (new RegExp(`alt=["']${logo}["']`, 'i').test(imgs)) {
+        operators.push(name);
+      }
+    }
+    results.push({ date: dateStr, operators });
   }
-  return [...new Set(dates)];
+  return results;
 }
 
 async function syncSpecialDraws() {
-  const dates = await scrapeSpecialDraws();
+  const draws = await scrapeSpecialDraws();
   let saved = 0;
-  for (const d of dates) {
-    const { rowCount } = await query(
-      'INSERT INTO special_draws (draw_date) VALUES ($1) ON CONFLICT (draw_date) DO NOTHING',
-      [d]
-    );
-    if (rowCount) saved++;
+  for (const { date, operators } of draws) {
+    for (const opName of operators) {
+      const { rows } = await query('SELECT id FROM operators WHERE name = $1', [opName]);
+      if (!rows.length) continue;
+      const { rowCount } = await query(
+        'INSERT INTO special_draws (draw_date, operator_id) VALUES ($1, $2) ON CONFLICT (draw_date, operator_id) DO NOTHING',
+        [date, rows[0].id]
+      );
+      if (rowCount) saved++;
+    }
   }
-  return { total: dates.length, saved };
+  return { total: draws.length, saved };
 }
 
 module.exports = { scrapeSpecialDraws, syncSpecialDraws };
