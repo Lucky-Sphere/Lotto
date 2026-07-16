@@ -79,7 +79,7 @@ app.get('/api/dashboard', async (req, res) => {
        WHERE sd.draw_date = (
          SELECT MIN(draw_date) FROM special_draws WHERE draw_date >= CURRENT_DATE
        )
-       ORDER BY o.name`
+       ORDER BY CASE o.name WHEN 'Magnum 4D' THEN 1 WHEN 'Sports Toto' THEN 2 WHEN 'Da Ma Cai' THEN 3 END`
     );
     res.json({ totalDraws: parseInt(total), operators, specialDraws });
   } catch (err) {

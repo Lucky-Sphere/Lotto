@@ -244,15 +244,16 @@ async function renderDashboard() {
         <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-star-fill text-warning me-2"></i>Special Draws</h5></div>
         ${data.specialDraws.map((sd, i) => {
           const tid = 'countdown-sp-' + i;
+          const colors = ['warning','info','success'];
           return `<div class="col-md-4">
-            <div class="card draw-card border-0 p-3" style="border-left:3px solid #ffc107 !important;">
+            <div class="card draw-card border-0 p-3">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <div class="fw-bold fs-6">${dayNames[d.getDay()]} <span class="badge bg-warning text-dark fs-6">Special</span></div>
+                  <div class="fw-bold fs-6">${dayNames[d.getDay()]}</div>
                   <div class="text-muted small">${d.toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' })}</div>
                 </div>
                 <div class="text-end">
-                  <span class="badge bg-${opColors[sd.operator_name]} bg-opacity-10 text-${opColors[sd.operator_name]}-emphasis">${opShort[sd.operator_name]}</span>
+                  <span class="badge bg-${colors[i]} bg-opacity-10 text-${colors[i]}-emphasis">${opShort[sd.operator_name]}</span>
                   <div class="draw-countdown fw-bold fs-5 text-warning-emphasis mt-1" id="${tid}">--h --m --s</div>
                 </div>
               </div>
