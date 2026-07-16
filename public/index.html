@@ -235,20 +235,15 @@ async function renderDashboard() {
         }).join('')}
       </div>
       ${data.specialDraws && data.specialDraws.length ? (() => {
-        const grouped = {};
-        data.specialDraws.forEach(sd => {
-          const datePart = sd.draw_date.split('T')[0];
-          if (!grouped[datePart]) grouped[datePart] = [];
-          grouped[datePart].push(sd.operator_name);
-        });
         const opColors = { 'Magnum 4D': 'warning', 'Sports Toto': 'info', 'Da Ma Cai': 'success' };
         const opShort = { 'Magnum 4D': 'Magnum', 'Sports Toto': 'Toto', 'Da Ma Cai': 'Damacai' };
+        const datePart = data.specialDraws[0].draw_date.split('T')[0];
+        const d = new Date(datePart + 'T19:00:00+08:00');
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         return `<div class="row g-3 mt-2 mb-2">
         <div class="col-12"><h5 class="text-muted fw-semibold"><i class="bi bi-star-fill text-warning me-2"></i>Special Draws</h5></div>
-        ${Object.entries(grouped).map(([datePart, ops]) => {
-          const d = new Date(datePart + 'T19:00:00+08:00');
-          const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-          const tid = 'countdown-sp-' + datePart;
+        ${data.specialDraws.map((sd, i) => {
+          const tid = 'countdown-sp-' + i;
           return `<div class="col-md-4">
             <div class="card draw-card border-0 p-3" style="border-left:3px solid #ffc107 !important;">
               <div class="d-flex justify-content-between align-items-start">
@@ -257,9 +252,7 @@ async function renderDashboard() {
                   <div class="text-muted small">${d.toLocaleDateString('en-MY', { year:'numeric', month:'short', day:'numeric' })}</div>
                 </div>
                 <div class="text-end">
-                  <div class="d-flex gap-1 justify-content-end flex-wrap">
-                    ${ops.map(op => `<span class="badge bg-${opColors[op]} bg-opacity-10 text-${opColors[op]}-emphasis">${opShort[op]}</span>`).join('')}
-                  </div>
+                  <span class="badge bg-${opColors[sd.operator_name]} bg-opacity-10 text-${opColors[sd.operator_name]}-emphasis">${opShort[sd.operator_name]}</span>
                   <div class="draw-countdown fw-bold fs-5 text-warning-emphasis mt-1" id="${tid}">--h --m --s</div>
                 </div>
               </div>
@@ -277,7 +270,7 @@ async function renderDashboard() {
       countdownTargets.push({ el, target: regTarget });
     });
     document.querySelectorAll('.draw-countdown[id^="countdown-sp-"]').forEach(el => {
-      const datePart = el.id.replace('countdown-sp-', '');
+      const datePart = data.specialDraws[0].draw_date.split('T')[0];
       countdownTargets.push({ el, target: new Date(datePart + 'T19:00:00+08:00').getTime() });
     });
     updateCountdowns();
