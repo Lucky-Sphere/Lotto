@@ -67,9 +67,9 @@ app.get('/api/dashboard', async (req, res) => {
         JOIN draws d ON d.id = dr.draw_id
         JOIN games g ON g.id = dr.game_id
         WHERE d.operator_id = $1 AND dr.prize_amount IS NOT NULL AND g.name ~* 'jackpot'
-        ORDER BY dr.prize_amount DESC LIMIT 3
+        ORDER BY dr.prize_amount DESC LIMIT 1
       `, [op.id]);
-      op.highestJp = jpRows.length ? jpRows : null;
+      op.highestJp = jpRows[0] || null;
     }
     const { rows: [{ total }] } = await db.query(`SELECT COUNT(*) AS total FROM draws`);
     res.json({ totalDraws: parseInt(total), operators });
